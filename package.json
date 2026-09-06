@@ -1,6 +1,6 @@
 {
   "name": "post-peek",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "private": true,
   "description": "Read one X post and leave. Chrome extension that opens x.com post links in a popup.",
   "license": "MIT",
