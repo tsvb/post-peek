@@ -32,6 +32,9 @@ jobs:
             exit 1
           fi
 
+      - name: Run tests
+        run: npm test
+
       - name: Build zip
         run: npm run build
 

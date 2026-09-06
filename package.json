@@ -5,6 +5,7 @@
   "description": "Read one X post and leave. Chrome extension that opens x.com post links in a popup.",
   "license": "MIT",
   "scripts": {
+    "test": "node --test",
     "icons": "node scripts/make-icons.js",
     "build": "node scripts/build-zip.js"
   }
