@@ -5,6 +5,9 @@
    attributes to the page's links, so page scripts cannot use them to detect
    the extension, and no MutationObserver has to walk the DOM.
 
+   The host list mirrors POST_RE in content.js exactly, so every link the
+   click handler will peek is dotted, and nothing else is.
+
    Dots are opt-in at the stylesheet level: they appear only once content.js
    has read the setting and marked <html data-postpeek-dots>. That way a user
    who has turned dots off never sees them flash before the setting loads, and
@@ -12,12 +15,12 @@
    no information a page could not already get from the dot's computed style. */
 html[data-postpeek-dots]
   a:is(
-    [href*="//x.com/"], [href*="//www.x.com/"], [href*="//mobile.x.com/"],
+    [href*="//x.com/"], [href*="//www.x.com/"], [href*="//mobile.x.com/"], [href*="//m.x.com/"],
     [href*="//twitter.com/"], [href*="//www.twitter.com/"], [href*="//mobile.twitter.com/"], [href*="//m.twitter.com/"],
-    [href*="//fxtwitter.com/"], [href*="//www.fxtwitter.com/"],
-    [href*="//vxtwitter.com/"], [href*="//www.vxtwitter.com/"],
-    [href*="//fixupx.com/"], [href*="//www.fixupx.com/"],
-    [href*="//fixvx.com/"], [href*="//www.fixvx.com/"]
+    [href*="//fxtwitter.com/"], [href*="//www.fxtwitter.com/"], [href*="//mobile.fxtwitter.com/"], [href*="//m.fxtwitter.com/"],
+    [href*="//vxtwitter.com/"], [href*="//www.vxtwitter.com/"], [href*="//mobile.vxtwitter.com/"], [href*="//m.vxtwitter.com/"],
+    [href*="//fixupx.com/"], [href*="//www.fixupx.com/"], [href*="//mobile.fixupx.com/"], [href*="//m.fixupx.com/"],
+    [href*="//fixvx.com/"], [href*="//www.fixvx.com/"], [href*="//mobile.fixvx.com/"], [href*="//m.fixvx.com/"]
   ):is([href*="/status/"], [href*="/statuses/"])::after {
   content: "";
   display: inline-block;

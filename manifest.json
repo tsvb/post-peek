@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Post Peek",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Read one X post and leave. Opens x.com and twitter.com post links in a popup, not the full site. No account, no cookies sent to X.",
   "icons": {
     "16": "icons/icon16.png",
