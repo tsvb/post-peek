@@ -115,8 +115,21 @@
   // twimg.com images, they are routed through the service worker instead.
   const MEDIA_ATTRS = { crossorigin: 'anonymous', referrerpolicy: 'no-referrer' };
 
+  // Media may only come from the hosts the manifest declares and PRIVACY.md
+  // names, which is the same allowlist background.js applies to the proxy.
+  // Anything else fails closed rather than quietly contacting a third party.
+  const MEDIA_HOSTS = new Set(['pbs.twimg.com', 'video.twimg.com']);
+
+  function safeMediaUrl(url) {
+    try {
+      const u = new URL(url);
+      if (u.protocol === 'https:' && MEDIA_HOSTS.has(u.hostname)) return u.href;
+    } catch { /* invalid */ }
+    return null;
+  }
+
   function img(src, attrs = {}) {
-    if (!safeHref(src)) return el('span');
+    if (!safeMediaUrl(src)) return el('span');
     const i = el('img', { src, loading: 'lazy', ...MEDIA_ATTRS, ...attrs });
     i.addEventListener('error', () => {
       if (i.dataset.proxied) return;
@@ -177,9 +190,9 @@
     if (!n) return null;
     const box = el('div', { class: `lb-media n${Math.min(n, 4)}` });
     for (const v of videos) {
-      if (!safeHref(v.src)) continue;
+      if (!safeMediaUrl(v.src)) continue;
       // preload="none": nothing is fetched from video.twimg.com until you press play.
-      const vid = el('video', { controls: '', playsinline: '', preload: 'none', poster: v.poster, src: v.src, ...MEDIA_ATTRS });
+      const vid = el('video', { controls: '', playsinline: '', preload: 'none', poster: safeMediaUrl(v.poster), src: v.src, ...MEDIA_ATTRS });
       if (v.gif) { vid.setAttribute('autoplay', ''); vid.setAttribute('loop', ''); vid.muted = true; }
       vid.addEventListener('error', () => {
         vid.replaceWith(el('div', { class: 'lb-media-fail' }, [
