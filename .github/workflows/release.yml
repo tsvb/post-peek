@@ -38,7 +38,7 @@ jobs:
       - name: Verify zip contents
         run: unzip -l "dist/post-peek-${{ steps.manifest.outputs.version }}.zip"
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: post-peek-${{ steps.manifest.outputs.version }}
           path: dist/*.zip
