@@ -1,0 +1,6 @@
+.claude/
+node_modules/
+harness.html
+*.zip
+.DS_Store
+Thumbs.db

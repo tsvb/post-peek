@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Litterbox test page</title>
+  <style>body { font-family: sans-serif; max-width: 700px; margin: 40px auto; line-height: 1.7; }</style>
+</head>
+<body>
+  <h1>Litterbox test links</h1>
+  <p>Each of these should show a blue dot and open in a popup when clicked:</p>
+  <ul>
+    <li><a href="https://x.com/jack/status/20">jack's first post (x.com)</a></li>
+    <li><a href="https://twitter.com/NASA/status/1732824684683784516">NASA (twitter.com, with media)</a></li>
+    <li><a href="https://x.com/i/web/status/20">i/web form</a></li>
+    <li><a href="https://x.com/jack/status/20?s=20&amp;t=abc">with query string</a></li>
+  </ul>
+  <p>These should NOT get a dot:</p>
+  <ul>
+    <li><a href="https://x.com/jack">profile link</a></li>
+    <li><a href="https://x.com/home">home</a></li>
+    <li><a href="https://example.com/status/123">non-X status URL</a></li>
+  </ul>
+  <button id="add">Add a link dynamically</button>
+  <div id="dyn"></div>
+  <script>
+    document.getElementById('add').onclick = () => {
+      const a = document.createElement('a');
+      a.href = 'https://x.com/jack/status/20';
+      a.textContent = 'dynamic link';
+      document.getElementById('dyn').append(a, document.createElement('br'));
+    };
+  </script>
+</body>
+</html>
