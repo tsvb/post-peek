@@ -1,4 +1,4 @@
-// Litterbox - Post Peeker (Chrome)
+// Post Peek
 // Service worker: fetches posts from X's syndication API (the same backend that
 // powers X's embed widgets). All requests are made with credentials omitted, so
 // no cookies are ever sent to X.

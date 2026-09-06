@@ -1,25 +1,41 @@
-# Litterbox - Post Peeker (Chrome)
+# Post Peek
 
-x.com without visiting x.com. A Chrome (Manifest V3) port of the Safari extension
-[Litterbox - Post Peeker](https://apps.apple.com/us/app/litterbox-post-peeker/id6805719216).
+Read one X post and leave. A Chrome (Manifest V3) extension that opens x.com and
+twitter.com post links in a popup instead of sending you to the full site.
 
-- Opens x.com / twitter.com post links in a popup so you can read the one post and leave.
+Post Peek is an independent, open-source project inspired by the Safari extension
+[Litterbox - Post Peeker](https://apps.apple.com/us/app/litterbox-post-peeker/id6805719216)
+by And a Dinosaur. It is not affiliated with that project or with X Corp.
+
+## Features
+
+- Opens post links in a popup so you can read the one post and close it.
 - Marks openable links with a small blue dot.
+- Renders text, photos, video, link cards, quoted posts, and reply context.
 - Uses the same syndication API that powers X's embed widgets.
 - Never sends cookies to X (every request uses `credentials: "omit"`). No account needed.
+- No data collection. See [PRIVACY.md](PRIVACY.md).
 
-## Install (unpacked)
+## Install from source
 
 1. Open `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and pick this folder.
-2. Open `test.html` in Chrome to try it.
-
-To regenerate the icons: `node scripts/make-icons.js`.
+2. Open `test.html` in Chrome to try it. For `file://` pages, also enable "Allow access to file URLs" on the extension's details page.
 
 ## Usage
 
 - Click a post link to peek. Ctrl/Cmd-, Shift-, Alt- or middle-click opens the link normally.
 - Esc or clicking the backdrop closes the popup. Quoted posts and "Replying to" open in the same popup.
 - Toolbar button: toggle peeking, the dot marker, and the popup theme.
+
+## Building for the Chrome Web Store
+
+```bash
+npm run build
+```
+
+This writes `dist/post-peek-<version>.zip` containing only the runtime files
+(`manifest.json`, `src/`, `options/`, `icons/`). Bump `version` in `manifest.json`
+before each release. To regenerate the icons: `npm run icons`.
 
 ## Layout
 
@@ -28,3 +44,8 @@ To regenerate the icons: `node scripts/make-icons.js`.
 - `src/content.js` - marks links, intercepts clicks, renders the popup inside a closed Shadow DOM.
 - `src/content.css` / `src/popup.css` - dot marker and popup styles.
 - `options/` - settings page (also the toolbar popup).
+- `scripts/` - icon generator and zip builder.
+
+## License
+
+[MIT](LICENSE)

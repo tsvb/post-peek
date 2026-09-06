@@ -1,6 +1,6 @@
-/* Litterbox - Post Peeker: dot marker on openable x.com links.
+/* Post Peek: dot marker on openable x.com links.
    Delivered via manifest "css" so it is not subject to the host page's CSP. */
-a[data-litterbox]::after {
+a[data-postpeek]::after {
   content: "";
   display: inline-block;
   width: 6px;
@@ -11,6 +11,6 @@ a[data-litterbox]::after {
   vertical-align: super;
   pointer-events: none;
 }
-html[data-litterbox-dots="off"] a[data-litterbox]::after {
+html[data-postpeek-dots="off"] a[data-postpeek]::after {
   display: none;
 }

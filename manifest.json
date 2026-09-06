@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Litterbox - Post Peeker",
+  "name": "Post Peek",
   "version": "1.0.0",
-  "description": "x.com without visiting x.com. Opens X/Twitter post links in a popup so you can read the one post and leave. No account, no cookies sent to X.",
+  "description": "Read one X post and leave. Opens x.com and twitter.com post links in a popup instead of the full site. No account, no cookies sent to X.",
   "icons": {
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",
@@ -45,7 +45,7 @@
     "open_in_tab": false
   },
   "action": {
-    "default_title": "Litterbox - Post Peeker",
+    "default_title": "Post Peek",
     "default_popup": "options/options.html"
   }
 }

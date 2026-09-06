@@ -1,8 +1,8 @@
-// Litterbox - Post Peeker (Chrome) content script.
+// Post Peek content script.
 // Marks x.com / twitter.com post links with a dot and opens them in a popup.
 (() => {
-  if (window.__litterboxLoaded) return;
-  window.__litterboxLoaded = true;
+  if (window.__postPeekLoaded) return;
+  window.__postPeekLoaded = true;
 
   const POST_RE =
     /^https?:\/\/(?:www\.|mobile\.|m\.)?(?:x\.com|twitter\.com|fxtwitter\.com|vxtwitter\.com|fixupx\.com|fixvx\.com)\/(?:#!\/)?(?:i\/web|[A-Za-z0-9_]{1,20})\/status(?:es)?\/(\d{1,25})(?:[/?#]|$)/;
@@ -16,9 +16,9 @@
 
   // ---------- link marking ----------
   function markLink(a) {
-    if (a.dataset.litterbox !== undefined) return;
+    if (a.dataset.postpeek !== undefined) return;
     const id = parsePostId(a.href);
-    if (id) a.dataset.litterbox = id;
+    if (id) a.dataset.postpeek = id;
   }
 
   function scan(root) {
@@ -32,7 +32,7 @@
   const observer = new MutationObserver((muts) => {
     for (const m of muts) {
       if (m.type === 'attributes' && m.target.tagName === 'A') {
-        delete m.target.dataset.litterbox;
+        delete m.target.dataset.postpeek;
         pending.add(m.target);
       }
       for (const n of m.addedNodes) if (n.nodeType === 1) pending.add(n);
@@ -70,7 +70,7 @@
 
   async function ensureHost() {
     if (host) return;
-    host = document.createElement('litterbox-peeker');
+    host = document.createElement('post-peek-host');
     shadow = host.attachShadow({ mode: 'closed' });
     shadow.adoptedStyleSheets = [await loadCss()];
     applyTheme();
@@ -299,7 +299,7 @@
     if (code === 'POST_NOT_FOUND') msg = 'This post does not exist or was deleted.';
     else if (code === 'POST_UNAVAILABLE') msg = 'This post is unavailable to embed (it may be from a protected account, age-restricted, or removed).';
     else if (/^HTTP_/.test(code)) msg = `X returned an error (${code.replace('HTTP_', 'HTTP ')}).`;
-    else if (/Extension context invalidated/i.test(code)) msg = 'Litterbox was updated. Reload this page to keep peeking.';
+    else if (/Extension context invalidated/i.test(code)) msg = 'Post Peek was updated. Reload this page to keep peeking.';
     return el('div', { class: 'lb-status' }, [
       el('div', { text: msg }),
       el('div', {}, extLink(url, 'Open on X', { class: 'lb-open' })),
@@ -353,7 +353,7 @@
     if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
     const a = e.composedPath().find((n) => n instanceof HTMLAnchorElement);
     if (!a) return;
-    const id = a.dataset.litterbox || parsePostId(a.href);
+    const id = a.dataset.postpeek || parsePostId(a.href);
     if (!id) return;
     e.preventDefault();
     e.stopImmediatePropagation();
@@ -362,7 +362,7 @@
 
   // ---------- settings ----------
   function applySettings() {
-    document.documentElement.dataset.litterboxDots = settings.showDots && settings.enabled ? 'on' : 'off';
+    document.documentElement.dataset.postpeekDots = settings.showDots && settings.enabled ? 'on' : 'off';
     applyTheme();
   }
   try {
