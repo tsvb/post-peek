@@ -1,3 +1,8 @@
+// Post Peek popup stylesheet.
+// Embedded as a string (instead of a web-accessible resource) so that no
+// website can probe chrome-extension:// URLs to detect the extension.
+// Loaded before content.js as a content script; shares its isolated world.
+var POST_PEEK_CSS = `
 :host {
   all: initial;
   --lb-bg: #ffffff;
@@ -164,3 +169,4 @@
 @keyframes lb-spin { to { transform: rotate(360deg); } }
 
 .lb-frame { width: 100%; border: 0; min-height: 300px; border-radius: 12px; background: #fff; }
+`;

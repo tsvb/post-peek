@@ -35,9 +35,11 @@ WHAT IT DOES
 
 PRIVACY
 
-Post Peek never sends your cookies or login to X. It fetches posts from the same public service that powers X's embedded posts, with credentials stripped from every request. You do not need an X account.
+Post Peek never sends your cookies or login to X, and never tells X which site you were reading. Posts and media are fetched anonymously from the same public service that powers X's embedded posts, with credentials and the Referer stripped from every request. Video is not fetched until you press play. You do not need an X account.
 
-The extension collects nothing. No analytics, no telemetry, no accounts, no servers of ours. Your only stored data is three settings (on/off, dot marker, theme) kept in Chrome's extension storage.
+The extension never scans or modifies the pages you visit. The dot marker is pure CSS, and only the link you click is inspected. Websites have nothing to probe for: the extension exposes no web-accessible resources and adds nothing to the page until you peek.
+
+The extension collects nothing. No analytics, no telemetry, no accounts, no servers of ours. Your only stored data is three settings (on/off, dot marker, theme) kept on your device in Chrome's local extension storage, never synced.
 
 HOW TO USE
 
@@ -66,11 +68,11 @@ Stores the user's three preferences: whether peeking is enabled, whether openabl
 **Host permission: cdn.syndication.twimg.com**
 Fetches the public content of the post the user clicked. This is the same endpoint that powers X's embedded posts. Requests are sent with credentials omitted, so no cookies reach X.
 
-**Host permissions: pbs.twimg.com, video.twimg.com, abs.twimg.com**
-Loads the post's avatar, photos, and video. When a website's Content Security Policy blocks images from these hosts, the extension fetches the image itself and displays it inline, which requires host access.
+**Host permissions: pbs.twimg.com, video.twimg.com**
+Loads the post's avatar, photos, and video, anonymously and without a Referer. When a website's Content Security Policy blocks images from these hosts, the extension fetches the image itself and displays it inline, which requires host access.
 
 **Content script on all http and https sites**
-The extension must find post links on whatever page the user is reading in order to mark them with a dot and intercept the click. It only reads link addresses on the page. It does not read, store, or transmit page content, and it does not run on x.com or twitter.com.
+The extension must run on whatever page the user is reading in order to intercept clicks on post links and show the popup there. It does not scan the DOM: the dot marker is a static stylesheet matched on the link's href, and the click handler reads only the address of the link that was clicked. It does not read, store, or transmit page content, does not run in frames, and does not run on x.com or twitter.com.
 
 ### Remote code
 

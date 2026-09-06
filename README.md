@@ -13,13 +13,23 @@ by And a Dinosaur. It is not affiliated with that project or with X Corp.
 - Marks openable links with a small blue dot.
 - Renders text, photos, video, link cards, quoted posts, and reply context.
 - Uses the same syndication API that powers X's embed widgets.
-- Never sends cookies to X (every request uses `credentials: "omit"`). No account needed.
+- Never sends cookies or a Referer to X: posts and media are fetched anonymously, so X
+  cannot tie a peek to your account or learn which site you were reading. No account needed.
+- Never scans or modifies the page. The dot is pure CSS; only the clicked link is inspected.
+- Nothing for websites to probe: no web-accessible resources, and nothing is added to the page until you peek.
+- Settings stay on your device (`chrome.storage.local`, never synced).
 - No data collection. See [PRIVACY.md](PRIVACY.md).
 
 ## Install from source
 
 1. Open `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and pick this folder.
-2. Open `test.html` in Chrome to try it. For `file://` pages, also enable "Allow access to file URLs" on the extension's details page.
+2. Serve this folder over HTTP and open the test page, for example:
+
+   ```bash
+   python -m http.server 8000
+   ```
+
+   then visit `http://localhost:8000/test.html`. The extension deliberately does not run on `file://` pages.
 
 ## Usage
 
@@ -49,8 +59,9 @@ zip to the Chrome Web Store.
 
 - `manifest.json` - MV3 manifest.
 - `src/background.js` - service worker; fetches posts from `cdn.syndication.twimg.com` and proxies images when a page's CSP blocks `twimg.com`.
-- `src/content.js` - marks links, intercepts clicks, renders the popup inside a closed Shadow DOM.
-- `src/content.css` / `src/popup.css` - dot marker and popup styles.
+- `src/content.js` - intercepts clicks on post links and renders the popup inside a closed Shadow DOM.
+- `src/content.css` - dot marker, matched purely on the link's `href`.
+- `src/popup-css.js` - popup stylesheet embedded as a string (so nothing is web-accessible).
 - `options/` - settings page (also the toolbar popup).
 - `scripts/` - icon generator and zip builder.
 

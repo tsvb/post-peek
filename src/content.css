@@ -1,6 +1,20 @@
-/* Post Peek: dot marker on openable x.com links.
-   Delivered via manifest "css" so it is not subject to the host page's CSP. */
-a[data-postpeek]::after {
+/* Post Peek: dot marker on openable x.com / twitter.com post links.
+   Delivered via manifest "css" so it is not subject to the host page's CSP.
+
+   Links are matched purely by their href attribute. The extension never adds
+   attributes to the page's links, so page scripts cannot use them to detect
+   the extension, and no MutationObserver has to walk the DOM. The only page
+   attribute ever set is data-postpeek-nodots on <html>, and only when the
+   user has turned dots (or the extension) off. */
+html:not([data-postpeek-nodots])
+  a:is(
+    [href*="//x.com/"], [href*="//www.x.com/"], [href*="//mobile.x.com/"],
+    [href*="//twitter.com/"], [href*="//www.twitter.com/"], [href*="//mobile.twitter.com/"], [href*="//m.twitter.com/"],
+    [href*="//fxtwitter.com/"], [href*="//www.fxtwitter.com/"],
+    [href*="//vxtwitter.com/"], [href*="//www.vxtwitter.com/"],
+    [href*="//fixupx.com/"], [href*="//www.fixupx.com/"],
+    [href*="//fixvx.com/"], [href*="//www.fixvx.com/"]
+  ):is([href*="/status/"], [href*="/statuses/"])::after {
   content: "";
   display: inline-block;
   width: 6px;
@@ -10,7 +24,4 @@ a[data-postpeek]::after {
   background: #1d9bf0;
   vertical-align: super;
   pointer-events: none;
-}
-html[data-postpeek-dots="off"] a[data-postpeek]::after {
-  display: none;
 }

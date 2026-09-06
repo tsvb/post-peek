@@ -14,7 +14,7 @@ async function get(id) {
 }
 
 function page({ data, theme, autoOpen, body }) {
-  const css = fs.readFileSync(path.join(root, 'src/popup.css'), 'utf8');
+  const cssjs = fs.readFileSync(path.join(root, 'src/popup-css.js'), 'utf8');
   const ccss = fs.readFileSync(path.join(root, 'src/content.css'), 'utf8');
   const js = fs.readFileSync(path.join(root, 'src/content.js'), 'utf8').replace("mode: 'closed'", "mode: 'open'");
   return `<!doctype html><html><head><meta charset="utf-8"><title>Post Peek showcase</title>
@@ -32,15 +32,15 @@ a{color:#1a5fb4}
 <script>
 const DATA=${J(data)};
 window.chrome={runtime:{getURL:(p)=>'chrome-extension://stub/'+p,lastError:null,sendMessage:(msg,cb)=>{setTimeout(()=>{const d=DATA[msg.id];cb(d?{ok:true,data:d}:{ok:false,error:'POST_NOT_FOUND'})},50)}},
-storage:{sync:{get:(d,cb)=>cb(Object.assign({},d,{theme:${JSON.stringify(theme)}})),set(){}},onChanged:{addListener(){}}}};
-const CSS=${J(css)};const _f=window.fetch;window.fetch=(u,...a)=>String(u).endsWith('popup.css')?Promise.resolve({text:()=>Promise.resolve(CSS)}):_f(u,...a);
+storage:{local:{get:(d,cb)=>cb(Object.assign({},d,{theme:${JSON.stringify(theme)}})),set(){}},onChanged:{addListener(){}}}};
 </script>
+<script>${cssjs}</script>
 <style>${ccss}</style></head><body>
 <header><div class="wrap"><b>The Launch Log</b><nav><a>Rockets</a><a>Missions</a><a>Archive</a><a>About</a></nav></div></header>
 <div class="wrap">${body}</div>
 <script>${js}</script>
 <script>
-${autoOpen ? `window.addEventListener('load',()=>setTimeout(()=>{document.querySelector('a[data-postpeek]').click();
+${autoOpen ? `window.addEventListener('load',()=>setTimeout(()=>{document.querySelector('a[href*="/status/"]').click();
   setTimeout(()=>{const h=document.querySelector('post-peek-host');const a=h&&h.shadowRoot.activeElement;if(a)a.blur();},400);},100));` : ''}
 </script>
 </body></html>`;

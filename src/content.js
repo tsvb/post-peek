@@ -1,5 +1,15 @@
 // Post Peek content script.
-// Marks x.com / twitter.com post links with a dot and opens them in a popup.
+// Intercepts clicks on x.com / twitter.com post links and opens them in a popup.
+//
+// Privacy notes:
+// - The page's DOM is never scanned or mutated to find links. The dot marker is
+//   pure CSS (content.css) matched on the href attribute, and the click handler
+//   inspects only the link that was actually clicked.
+// - The only element added to the page is the popup host, and only after the
+//   user peeks. The only page attribute ever set is data-postpeek-nodots on
+//   <html>, when the user turns dots off.
+// - All media is loaded anonymously (no cookies) with no Referer, so X never
+//   learns which site you were reading.
 (() => {
   if (window.__postPeekLoaded) return;
   window.__postPeekLoaded = true;
@@ -14,65 +24,23 @@
     return m ? m[1] : null;
   }
 
-  // ---------- link marking ----------
-  function markLink(a) {
-    if (a.dataset.postpeek !== undefined) return;
-    const id = parsePostId(a.href);
-    if (id) a.dataset.postpeek = id;
-  }
-
-  function scan(root) {
-    if (!root || root.nodeType !== Node.ELEMENT_NODE) return;
-    if (root.tagName === 'A') markLink(root);
-    for (const a of root.querySelectorAll('a[href]')) markLink(a);
-  }
-
-  let pending = new Set();
-  let scheduled = false;
-  const observer = new MutationObserver((muts) => {
-    for (const m of muts) {
-      if (m.type === 'attributes' && m.target.tagName === 'A') {
-        delete m.target.dataset.postpeek;
-        pending.add(m.target);
-      }
-      for (const n of m.addedNodes) if (n.nodeType === 1) pending.add(n);
-    }
-    if (!scheduled) {
-      scheduled = true;
-      requestAnimationFrame(() => {
-        scheduled = false;
-        const batch = pending;
-        pending = new Set();
-        for (const n of batch) scan(n);
-      });
-    }
-  });
-
-  function start() {
-    scan(document.body);
-    observer.observe(document.documentElement, {
-      childList: true, subtree: true, attributes: true, attributeFilter: ['href'],
-    });
-  }
-
   // ---------- popup ----------
   let host = null, shadow = null, overlay = null, lastFocus = null;
-  let cssPromise = null;
+  let sheet = null;
 
+  // popup-css.js (loaded before this script) defines POST_PEEK_CSS. Embedding
+  // the stylesheet avoids exposing it as a web-accessible resource, which
+  // would let any website detect the extension.
   function loadCss() {
-    if (!cssPromise) {
-      cssPromise = fetch(chrome.runtime.getURL('src/popup.css'))
-        .then((r) => r.text())
-        .then((txt) => { const s = new CSSStyleSheet(); s.replaceSync(txt); return s; });
-    }
-    return cssPromise;
+    if (!sheet) { sheet = new CSSStyleSheet(); sheet.replaceSync(POST_PEEK_CSS); }
+    return sheet;
   }
 
-  async function ensureHost() {
+  function ensureHost() {
     if (host) return;
     host = document.createElement('post-peek-host');
     shadow = host.attachShadow({ mode: 'closed' });
-    shadow.adoptedStyleSheets = [await loadCss()];
+    shadow.adoptedStyleSheets = [loadCss()];
     applyTheme();
     (document.body || document.documentElement).appendChild(host);
   }
@@ -121,17 +89,32 @@
     return s;
   }
 
+  // Only http(s) URLs from the API are ever turned into links.
+  function safeHref(href) {
+    try {
+      const u = new URL(href);
+      if (u.protocol === 'https:' || u.protocol === 'http:') return u.href;
+    } catch { /* invalid */ }
+    return null;
+  }
+
   function extLink(href, children, attrs = {}) {
-    return el('a', { href, target: '_blank', rel: 'noopener noreferrer', ...attrs }, children);
+    return el('a', { href: safeHref(href), target: '_blank', rel: 'noopener noreferrer', ...attrs }, children);
   }
 
   function postUrl(t) {
     return `https://x.com/${t.user?.screen_name || 'i/web'}/status/${t.id_str}`;
   }
 
-  // If the page CSP blocks twimg.com images, route them through the service worker.
+  // Media is requested anonymously: crossorigin="anonymous" sends no cookies and
+  // referrerpolicy="no-referrer" sends no Referer, so X cannot tie the request
+  // to your account or learn the page you are reading. If the page's CSP blocks
+  // twimg.com images, they are routed through the service worker instead.
+  const MEDIA_ATTRS = { crossorigin: 'anonymous', referrerpolicy: 'no-referrer' };
+
   function img(src, attrs = {}) {
-    const i = el('img', { src, loading: 'lazy', ...attrs });
+    if (!safeHref(src)) return el('span');
+    const i = el('img', { src, loading: 'lazy', ...MEDIA_ATTRS, ...attrs });
     i.addEventListener('error', () => {
       if (i.dataset.proxied) return;
       i.dataset.proxied = '1';
@@ -191,7 +174,9 @@
     if (!n) return null;
     const box = el('div', { class: `lb-media n${Math.min(n, 4)}` });
     for (const v of videos) {
-      const vid = el('video', { controls: '', playsinline: '', preload: 'metadata', poster: v.poster, src: v.src });
+      if (!safeHref(v.src)) continue;
+      // preload="none": nothing is fetched from video.twimg.com until you press play.
+      const vid = el('video', { controls: '', playsinline: '', preload: 'none', poster: v.poster, src: v.src, ...MEDIA_ATTRS });
       if (v.gif) { vid.setAttribute('autoplay', ''); vid.setAttribute('loop', ''); vid.muted = true; }
       vid.addEventListener('error', () => {
         vid.replaceWith(el('div', { class: 'lb-media-fail' }, [
@@ -320,7 +305,7 @@
   let requestToken = 0;
 
   async function showPost(id) {
-    await ensureHost();
+    ensureHost();
     if (!overlay) {
       lastFocus = document.activeElement;
       overlay = el('div', { class: 'lb-overlay', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'X post preview' });
@@ -353,7 +338,7 @@
     if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
     const a = e.composedPath().find((n) => n instanceof HTMLAnchorElement);
     if (!a) return;
-    const id = a.dataset.postpeek || parsePostId(a.href);
+    const id = parsePostId(a.href);
     if (!id) return;
     e.preventDefault();
     e.stopImmediatePropagation();
@@ -362,17 +347,19 @@
 
   // ---------- settings ----------
   function applySettings() {
-    document.documentElement.dataset.postpeekDots = settings.showDots && settings.enabled ? 'on' : 'off';
+    // Dots are on by default via content.css; only the off state touches the page.
+    if (settings.showDots && settings.enabled) delete document.documentElement.dataset.postpeekNodots;
+    else document.documentElement.dataset.postpeekNodots = '';
     applyTheme();
   }
   try {
-    chrome.storage.sync.get(settings, (s) => { Object.assign(settings, s); applySettings(); });
+    // Settings live in local storage only; nothing is synced to a Google account.
+    chrome.storage.local.get(settings, (s) => { Object.assign(settings, s); applySettings(); });
     chrome.storage.onChanged.addListener((changes, area) => {
-      if (area !== 'sync') return;
+      if (area !== 'local') return;
       for (const [k, v] of Object.entries(changes)) if (k in settings) settings[k] = v.newValue;
       applySettings();
     });
   } catch { /* storage unavailable */ }
 
-  if (document.body) start(); else document.addEventListener('DOMContentLoaded', start, { once: true });
 })();

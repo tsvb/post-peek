@@ -1,7 +1,8 @@
 // Post Peek
 // Service worker: fetches posts from X's syndication API (the same backend that
-// powers X's embed widgets). All requests are made with credentials omitted, so
-// no cookies are ever sent to X.
+// powers X's embed widgets). All requests are made with credentials omitted and
+// no Referer, so no cookies are ever sent to X and X never learns which page
+// you were reading. Fetched posts are held only in memory for a few minutes.
 
 const SYNDICATION = 'https://cdn.syndication.twimg.com/tweet-result';
 
@@ -45,6 +46,7 @@ async function fetchTweet(id) {
 
   const res = await fetch(url.toString(), {
     credentials: 'omit',
+    referrerPolicy: 'no-referrer',
     cache: 'no-store',
     headers: { Accept: 'application/json' },
   });
@@ -73,11 +75,14 @@ function toBase64(buf) {
 }
 
 // Used as a fallback when the host page's Content-Security-Policy blocks
-// loading images from twimg.com directly.
+// loading images from twimg.com directly. Only the media hosts declared in the
+// manifest are allowed.
+const MEDIA_HOSTS = new Set(['pbs.twimg.com', 'video.twimg.com']);
+
 async function fetchMedia(url) {
   const u = new URL(url);
-  if (!/\.twimg\.com$/.test(u.hostname)) throw new Error('BAD_HOST');
-  const res = await fetch(url, { credentials: 'omit' });
+  if (u.protocol !== 'https:' || !MEDIA_HOSTS.has(u.hostname)) throw new Error('BAD_HOST');
+  const res = await fetch(u.href, { credentials: 'omit', referrerPolicy: 'no-referrer' });
   if (!res.ok) throw new Error(`HTTP_${res.status}`);
   const type = res.headers.get('content-type') || 'application/octet-stream';
   const buf = await res.arrayBuffer();
@@ -99,4 +104,17 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     }
   })();
   return true; // keep the channel open for the async response
+});
+
+// Settings moved from chrome.storage.sync to chrome.storage.local so that they
+// are never uploaded to a Google account. Migrate once, then clear the synced copy.
+chrome.runtime.onInstalled.addListener(({ reason }) => {
+  if (reason !== 'update') return;
+  chrome.storage.sync.get(null, (synced) => {
+    if (chrome.runtime.lastError || !synced || !Object.keys(synced).length) return;
+    chrome.storage.local.get(null, (local) => {
+      const merged = { ...synced, ...local };
+      chrome.storage.local.set(merged, () => chrome.storage.sync.clear());
+    });
+  });
 });
