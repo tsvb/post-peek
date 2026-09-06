@@ -15,8 +15,8 @@ by And a Dinosaur. It is not affiliated with that project or with X Corp.
 - Uses the same syndication API that powers X's embed widgets.
 - Never sends cookies or a Referer to X: posts and media are fetched anonymously, so X
   cannot tie a peek to your account or learn which site you were reading. No account needed.
-- Never scans or modifies the page. The dot is pure CSS; only the clicked link is inspected.
-- Nothing for websites to probe: no web-accessible resources, and nothing is added to the page until you peek.
+- Never scans the page or touches its links. The dot is pure CSS; only the clicked link is inspected.
+- Nothing for websites to probe: no web-accessible resources, and with dots turned off nothing whatsoever is written to the page.
 - Settings stay on your device (`chrome.storage.local`, never synced).
 - No data collection. See [PRIVACY.md](PRIVACY.md).
 

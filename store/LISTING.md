@@ -37,7 +37,7 @@ PRIVACY
 
 Post Peek never sends your cookies or login to X, and never tells X which site you were reading. Posts and media are fetched anonymously from the same public service that powers X's embedded posts, with credentials and the Referer stripped from every request. Video is not fetched until you press play. You do not need an X account.
 
-The extension never scans or modifies the pages you visit. The dot marker is pure CSS, and only the link you click is inspected. Websites have nothing to probe for: the extension exposes no web-accessible resources and adds nothing to the page until you peek.
+The extension never scans the pages you visit or touches their links. The dot marker is pure CSS, and only the link you click is inspected. Websites have nothing to probe for: the extension exposes no web-accessible resources, and with the dot marker turned off it writes nothing to the page at all.
 
 The extension collects nothing. No analytics, no telemetry, no accounts, no servers of ours. Your only stored data is three settings (on/off, dot marker, theme) kept on your device in Chrome's local extension storage, never synced.
 

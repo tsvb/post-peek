@@ -6,8 +6,11 @@
 //   pure CSS (content.css) matched on the href attribute, and the click handler
 //   inspects only the link that was actually clicked.
 // - The only element added to the page is the popup host, and only after the
-//   user peeks. The only page attribute ever set is data-postpeek-nodots on
-//   <html>, when the user turns dots off.
+//   user peeks. The only page attribute ever set is data-postpeek-dots on
+//   <html>, and only when dots are on, which a page could already detect from
+//   the dot's computed style. With dots off, nothing is written to the page.
+// - Runs at document_start so the dot setting is applied before the page
+//   paints, rather than after it has already rendered.
 // - All media is loaded anonymously (no cookies) with no Referer, so X never
 //   learns which site you were reading.
 (() => {
@@ -347,9 +350,11 @@
 
   // ---------- settings ----------
   function applySettings() {
-    // Dots are on by default via content.css; only the off state touches the page.
-    if (settings.showDots && settings.enabled) delete document.documentElement.dataset.postpeekNodots;
-    else document.documentElement.dataset.postpeekNodots = '';
+    // content.css draws a dot only under html[data-postpeek-dots], so dots stay
+    // invisible until the setting has actually been read. A user with dots off
+    // never sees them flash, and nothing is written to the page at all.
+    if (settings.showDots && settings.enabled) document.documentElement.dataset.postpeekDots = '';
+    else delete document.documentElement.dataset.postpeekDots;
     applyTheme();
   }
   try {
