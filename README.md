@@ -34,8 +34,16 @@ npm run build
 ```
 
 This writes `dist/post-peek-<version>.zip` containing only the runtime files
-(`manifest.json`, `src/`, `options/`, `icons/`). Bump `version` in `manifest.json`
-before each release. To regenerate the icons: `npm run icons`.
+(`manifest.json`, `src/`, `options/`, `icons/`). To regenerate the icons: `npm run icons`.
+
+## Releasing
+
+1. Bump `version` in `manifest.json` and `package.json`, then commit.
+2. Tag and push: `git tag v1.2.3 && git push origin v1.2.3`.
+
+The [release workflow](.github/workflows/release.yml) checks that the tag matches the
+manifest version, builds the zip, and attaches it to a GitHub release. Upload that same
+zip to the Chrome Web Store.
 
 ## Layout
 

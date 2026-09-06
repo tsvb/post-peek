@@ -1,0 +1,59 @@
+name: Build extension zip
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Read manifest version
+        id: manifest
+        run: echo "version=$(node -p "require('./manifest.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Check tag matches manifest version
+        if: github.ref_type == 'tag'
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          if [ "$tag" != "${{ steps.manifest.outputs.version }}" ]; then
+            echo "Tag v$tag does not match manifest version ${{ steps.manifest.outputs.version }}" >&2
+            exit 1
+          fi
+
+      - name: Build zip
+        run: npm run build
+
+      - name: Verify zip contents
+        run: unzip -l "dist/post-peek-${{ steps.manifest.outputs.version }}.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: post-peek-${{ steps.manifest.outputs.version }}
+          path: dist/*.zip
+          if-no-files-found: error
+
+      - name: Create or update GitHub release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          zip="dist/post-peek-${{ steps.manifest.outputs.version }}.zip"
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "$zip" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" "$zip" \
+              --title "Post Peek ${{ steps.manifest.outputs.version }}" \
+              --generate-notes
+          fi
