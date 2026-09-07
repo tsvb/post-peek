@@ -12,7 +12,7 @@ Read one X post and leave. Opens x.com and twitter.com post links in a popup. No
 
 ## Category
 
-Productivity > Tools
+Tools
 
 ## Language
 
@@ -56,35 +56,49 @@ It is an independent project inspired by the Safari extension Litterbox - Post P
 
 ## Privacy practices tab
 
+One field per heading, in the order the Developer Dashboard shows them.
+
 ### Single purpose description
 
 Opens links to x.com and twitter.com posts in an on-page popup so users can read a single post without navigating to the site.
 
-### Permission justifications
+### storage justification
 
-**storage**
 Stores the user's three preferences: whether peeking is enabled, whether openable links are marked with a dot, and the popup theme. Nothing else is stored.
 
-**Host permission: cdn.syndication.twimg.com**
-Fetches the public content of the post the user clicked. This is the same endpoint that powers X's embedded posts. Requests are sent with credentials omitted, so no cookies reach X.
+### Host permission justification
 
-**Host permissions: pbs.twimg.com, video.twimg.com**
-Loads the post's avatar, photos, and video, anonymously and without a Referer. When a website's Content Security Policy blocks images from these hosts, the extension fetches the image itself and displays it inline, which requires host access.
+The dashboard has one box for every host permission and match pattern, so this covers all of them at once. Justifying only the syndication host leaves the broad content-script match unexplained, which is what an in-depth review asks about.
 
-**Content script on all http and https sites**
-The extension must run on whatever page the user is reading in order to intercept clicks on post links and show the popup there. It does not scan the DOM: the dot marker is a static stylesheet matched on the link's href, and the click handler reads only the address of the link that was clicked. It does not read, store, or transmit page content, does not run in frames, and does not run on x.com or twitter.com.
+cdn.syndication.twimg.com fetches the public content of the post the user clicked - the same endpoint that powers X's embedded posts, requested with credentials omitted so no cookies reach X. pbs.twimg.com and video.twimg.com load the post's avatar, photos, and video, anonymously and without a Referer; when a site's Content Security Policy blocks images from these hosts, the extension fetches the image itself and displays it inline, which requires host access. The content script runs on http and https pages because the extension must run on whatever page the user is reading to intercept clicks on post links and show the popup there. It does not scan the DOM: the dot marker is a static stylesheet matched on the link's href, and the click handler reads only the address of the link that was clicked. It does not read, store, or transmit page content, does not run in frames, and does not run on x.com or twitter.com.
 
-### Remote code
+### Are you using remote code?
 
-No. All code ships in the extension package. Post content is fetched as data (JSON) and rendered with DOM APIs; no scripts are downloaded or executed.
+Select **No, I am not using remote code**. If the justification box is still required:
+
+All code ships in the extension package. Post content is fetched as data (JSON) and rendered with DOM APIs; no scripts are downloaded or executed.
 
 ### Data usage
 
-Check "I do not collect or use any user data." All certifications apply: no sale of data, no use unrelated to the single purpose, no use for creditworthiness or lending.
+Leave every data type unchecked - the extension collects none of them - and tick all three certifications: no sale or transfer to third parties, no use unrelated to the single purpose, no use for creditworthiness or lending.
 
 ### Privacy policy URL
 
 https://github.com/tsvb/post-peek/blob/main/PRIVACY.md
+
+## Distribution tab
+
+- Payments: Free of charge.
+- Visibility: Public.
+- Distribution: All regions.
+
+## Publisher settings
+
+These live on the account's Settings page, not the item, and both block Submit
+until they are done:
+
+- Trader declaration (EEA consumer law): non-trader, since the extension is free and not published in the course of a business.
+- Contact email, verified by following the link Google mails. It is displayed publicly on the listing.
 
 ## Store assets
 
