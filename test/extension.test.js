@@ -217,3 +217,13 @@ test('every request is made without cookies or a Referer', () => {
   assert.strictEqual(count(/credentials: 'omit'/g), fetches, 'a fetch is missing credentials: omit');
   assert.strictEqual(count(/referrerPolicy: 'no-referrer'/g), fetches, 'a fetch is missing no-referrer');
 });
+
+// ------------------------------------------------------------------ changelog
+
+test('the changelog has an entry for the shipping version', () => {
+  const changelog = read('CHANGELOG.md');
+  assert.ok(
+    changelog.includes(`## [${manifest.version}]`),
+    `CHANGELOG.md has no section for ${manifest.version}`,
+  );
+});

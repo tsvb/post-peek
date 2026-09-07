@@ -48,8 +48,9 @@ This writes `dist/post-peek-<version>.zip` containing only the runtime files
 
 ## Releasing
 
-1. Bump `version` in `manifest.json` and `package.json`, then commit.
-2. Tag and push: `git tag v1.2.3 && git push origin v1.2.3`.
+1. Move the `Unreleased` notes in [CHANGELOG.md](CHANGELOG.md) under the new version.
+2. Bump `version` in `manifest.json` and `package.json`, then commit.
+3. Tag and push: `git tag v1.2.3 && git push origin v1.2.3`.
 
 The [release workflow](.github/workflows/release.yml) checks that the tag matches the
 manifest version, builds the zip, and attaches it to a GitHub release. Upload that same
@@ -64,6 +65,8 @@ zip to the Chrome Web Store.
 - `src/popup-css.js` - popup stylesheet embedded as a string (so nothing is web-accessible).
 - `options/` - settings page (also the toolbar popup).
 - `scripts/` - icon generator and zip builder.
+- `test/` - dependency-free tests for the packaging and privacy invariants (`npm test`).
+- `test.html` - page of links for checking dots and peeking by hand in the browser.
 
 ## License
 
