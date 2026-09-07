@@ -3,7 +3,10 @@
 All notable changes to Post Peek. Versions follow [semantic versioning](https://semver.org/),
 and each released version is a git tag and a Chrome Web Store upload.
 
-## Unreleased
+## [1.1.4] - 2026-09-06
+
+Repository and test changes only. The packaged extension - `manifest.json`, `src/`,
+`options/`, `icons/` - is unchanged from 1.1.3 apart from the version string.
 
 ### Added
 
@@ -95,6 +98,7 @@ and each released version is a git tag and a Chrome Web Store upload.
   a release workflow that checks the tag against the manifest version and attaches the
   zip to a GitHub release, and Chrome Web Store listing copy, screenshots, and promo tiles.
 
+[1.1.4]: https://github.com/tsvb/post-peek/releases/tag/v1.1.4
 [1.1.3]: https://github.com/tsvb/post-peek/releases/tag/v1.1.3
 [1.1.2]: https://github.com/tsvb/post-peek/releases/tag/v1.1.2
 [1.1.1]: https://github.com/tsvb/post-peek/releases/tag/v1.1.1
