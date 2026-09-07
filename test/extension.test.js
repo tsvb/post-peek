@@ -128,6 +128,20 @@ test('every host the click handler peeks is dotted, and no others', () => {
   assert.deepStrictEqual(dotted, peekable.sort());
 });
 
+// test.html is how the dot list is checked by hand in a real browser, so it has
+// to keep up with the hosts. v1.1.3 shipped a dot list that had drifted; the
+// page could not have caught it, because it never linked to m.x.com.
+test('test.html links to every dotted host', () => {
+  const page = read('test.html');
+  const dotted = [...contentCss.matchAll(/href\*="\/\/([^"]+)\/"/g)].map((m) => m[1]);
+  for (const host of dotted) {
+    assert.ok(
+      page.includes(`href="https://${host}/jack/status/20"`),
+      `test.html has no peekable link for ${host}`,
+    );
+  }
+});
+
 test('POST_RE matches post links and rejects everything else', () => {
   for (const url of [
     'https://x.com/jack/status/20',

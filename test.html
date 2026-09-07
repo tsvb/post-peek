@@ -3,31 +3,125 @@
 <head>
   <meta charset="utf-8">
   <title>Post Peek test page</title>
-  <style>body { font-family: sans-serif; max-width: 700px; margin: 40px auto; line-height: 1.7; }</style>
+  <style>
+    body { font-family: sans-serif; max-width: 760px; margin: 40px auto; line-height: 1.7; }
+    h2 { margin-top: 2em; }
+    ul { columns: 2; }
+    ul.wide { columns: 1; }
+    p.note { color: #555; font-size: 0.95em; }
+    button { font: inherit; padding: 4px 10px; }
+  </style>
 </head>
 <body>
   <h1>Post Peek test links</h1>
-  <p>Each of these should show a blue dot and open in a popup when clicked:</p>
+  <p class="note">
+    Serve this file over HTTP (the extension does not run on <code>file://</code>) and
+    load it with dots turned on. Every link under a "should" heading is a live check of
+    the host list in <code>src/content.css</code> against <code>POST_RE</code> in
+    <code>src/content.js</code>: the two are meant to agree exactly, so a dot without a
+    popup, or a popup without a dot, is a bug.
+  </p>
+
+  <h2>Should show a dot and peek: every accepted host</h2>
   <ul>
-    <li><a href="https://x.com/jack/status/20">jack's first post (x.com)</a></li>
-    <li><a href="https://twitter.com/NASA/status/1732824684683784516">NASA (twitter.com, with media)</a></li>
-    <li><a href="https://x.com/i/web/status/20">i/web form</a></li>
-    <li><a href="https://x.com/jack/status/20?s=20&amp;t=abc">with query string</a></li>
+    <li><a href="https://x.com/jack/status/20">x.com</a></li>
+    <li><a href="https://www.x.com/jack/status/20">www.x.com</a></li>
+    <li><a href="https://mobile.x.com/jack/status/20">mobile.x.com</a></li>
+    <li><a href="https://m.x.com/jack/status/20">m.x.com</a></li>
+    <li><a href="https://twitter.com/jack/status/20">twitter.com</a></li>
+    <li><a href="https://www.twitter.com/jack/status/20">www.twitter.com</a></li>
+    <li><a href="https://mobile.twitter.com/jack/status/20">mobile.twitter.com</a></li>
+    <li><a href="https://m.twitter.com/jack/status/20">m.twitter.com</a></li>
+    <li><a href="https://fxtwitter.com/jack/status/20">fxtwitter.com</a></li>
+    <li><a href="https://www.fxtwitter.com/jack/status/20">www.fxtwitter.com</a></li>
+    <li><a href="https://mobile.fxtwitter.com/jack/status/20">mobile.fxtwitter.com</a></li>
+    <li><a href="https://m.fxtwitter.com/jack/status/20">m.fxtwitter.com</a></li>
+    <li><a href="https://vxtwitter.com/jack/status/20">vxtwitter.com</a></li>
+    <li><a href="https://www.vxtwitter.com/jack/status/20">www.vxtwitter.com</a></li>
+    <li><a href="https://mobile.vxtwitter.com/jack/status/20">mobile.vxtwitter.com</a></li>
+    <li><a href="https://m.vxtwitter.com/jack/status/20">m.vxtwitter.com</a></li>
+    <li><a href="https://fixupx.com/jack/status/20">fixupx.com</a></li>
+    <li><a href="https://www.fixupx.com/jack/status/20">www.fixupx.com</a></li>
+    <li><a href="https://mobile.fixupx.com/jack/status/20">mobile.fixupx.com</a></li>
+    <li><a href="https://m.fixupx.com/jack/status/20">m.fixupx.com</a></li>
+    <li><a href="https://fixvx.com/jack/status/20">fixvx.com</a></li>
+    <li><a href="https://www.fixvx.com/jack/status/20">www.fixvx.com</a></li>
+    <li><a href="https://mobile.fixvx.com/jack/status/20">mobile.fixvx.com</a></li>
+    <li><a href="https://m.fixvx.com/jack/status/20">m.fixvx.com</a></li>
   </ul>
-  <p>These should NOT get a dot:</p>
-  <ul>
+
+  <h2>Should show a dot and peek: URL shapes</h2>
+  <ul class="wide">
+    <li><a href="https://x.com/jack/status/20">jack's first post</a></li>
+    <li><a href="https://twitter.com/NASA/status/1732824684683784516">a post with media</a></li>
+    <li><a href="https://x.com/i/web/status/20">i/web form</a></li>
+    <li><a href="https://twitter.com/jack/statuses/20">/statuses/ form</a></li>
+    <li><a href="https://x.com/jack/status/20?s=20&amp;t=abc">with query string</a></li>
+    <li><a href="https://x.com/jack/status/20#anchor">with fragment</a></li>
+    <li><a href="https://x.com/#!/jack/status/20">old #!/ form</a></li>
+    <li><a href="https://x.com/jack/status/20/photo/1">/photo/1 suffix</a></li>
+    <li><a href="https://x.com/jack/status/20"><b>markup</b> inside the link</a></li>
+  </ul>
+
+  <h2>Should NOT get a dot, and should navigate normally</h2>
+  <ul class="wide">
     <li><a href="https://x.com/jack">profile link</a></li>
     <li><a href="https://x.com/home">home</a></li>
+    <li><a href="https://x.com/search?q=status">search</a></li>
     <li><a href="https://example.com/status/123">non-X status URL</a></li>
+    <li><a href="https://notx.com/jack/status/20">notx.com (host must match exactly)</a></li>
+    <li><a href="https://x.com.evil.com/jack/status/20">x.com.evil.com (suffix trick)</a></li>
+    <li><a href="https://evil.com/?u=https://x.com/jack/status/20">x.com post URL in a query string</a></li>
   </ul>
-  <button id="add">Add a link dynamically</button>
+
+  <h2>Known cosmetic mismatch: dotted, but will not peek</h2>
+  <p class="note">
+    The CSS can only test <code>href</code> substrings, so it cannot check the post id
+    the way <code>POST_RE</code> does. These get a dot and then navigate normally on
+    click. Harmless, but if that ever stops being true, this is where it shows.
+  </p>
+  <ul class="wide">
+    <li><a href="https://x.com/jack/status/notanumber">non-numeric id</a></li>
+    <li><a href="https://x.com/jack/status/123456789012345678901234567">id longer than 25 digits</a></li>
+  </ul>
+
+  <h2>Modifier clicks: should always navigate, never peek</h2>
+  <p class="note">
+    Ctrl/Cmd-click, Shift-click, Alt-click and middle-click on
+    <a href="https://x.com/jack/status/20">this link</a> must open it the normal way.
+  </p>
+
+  <h2>Links added after load</h2>
+  <p class="note">
+    Nothing watches the DOM: the dot is a CSS rule on <code>href</code>, and the click
+    handler is a single delegated listener on <code>document</code>. So a link inserted
+    now should be dotted the instant it appears, with no observer to miss it. The shadow
+    root case is the one exception: content.css does not cross a shadow boundary, so that
+    link gets no dot, but the click is still matched through <code>composedPath()</code>
+    and should peek.
+  </p>
+  <p>
+    <button id="add">Add a link</button>
+    <button id="add-shadow">Add a link inside a shadow root</button>
+  </p>
   <div id="dyn"></div>
   <script>
-    document.getElementById('add').onclick = () => {
+    function postLink(label) {
       const a = document.createElement('a');
       a.href = 'https://x.com/jack/status/20';
-      a.textContent = 'dynamic link';
-      document.getElementById('dyn').append(a, document.createElement('br'));
+      a.textContent = label;
+      return a;
+    }
+    document.getElementById('add').onclick = () => {
+      document.getElementById('dyn').append(postLink('dynamic link'), document.createElement('br'));
+    };
+    document.getElementById('add-shadow').onclick = () => {
+      const box = document.createElement('div');
+      const root = box.attachShadow({ mode: 'open' });
+      // No dot is expected in here: document stylesheets, content.css
+      // included, do not style shadow trees. The click should still peek.
+      root.append(postLink('link in a shadow root'));
+      document.getElementById('dyn').append(box, document.createElement('br'));
     };
   </script>
 </body>
