@@ -55,7 +55,7 @@ https://github.com/tsvb/post-peek
 Post Peek is an independent project inspired by Litterbox, the Safari extension for iOS and macOS by Zhenyi Tan (And a Dinosaur). Litterbox is the original, it is free, and if you use Safari you should use it instead:
 https://andadinosaur.com/launch-litterbox
 
-Post Peek is a separate Chrome implementation of the same idea, written from scratch. It is not affiliated with, endorsed by, or supported by Litterbox, And a Dinosaur, or X Corp.
+The popup, the marker on links that can be opened, and the cookie-free fetching are all Litterbox's ideas. Post Peek is a separate Chrome implementation of them, written from scratch. It is not affiliated with, endorsed by, or supported by Litterbox, And a Dinosaur, or X Corp.
 
 ## Privacy practices tab
 

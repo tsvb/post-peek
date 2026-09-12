@@ -74,13 +74,15 @@ zip to the Chrome Web Store.
 Post Peek exists because of **Litterbox**, a Safari extension for iOS and macOS by
 Zhenyi Tan, who publishes as And a Dinosaur:
 
-- Launch post: [Launch: Litterbox](https://andadinosaur.com/launch-litterbox)
+- Launch post: [Launch: Litterbox](https://andadinosaur.com/launch-litterbox), 5 September 2026
 - App Store, free: [Litterbox - Post Peeker](https://apps.apple.com/us/app/litterbox-post-peeker/id6805719216)
 - Developer: [And a Dinosaur](https://andadinosaur.com)
 
-Litterbox got there first with both halves of the idea this extension is built on: open a
-linked x.com post in a popup instead of going to the site, and fetch that post through the
-same public embed API X uses for its own embeds, so no cookies are sent. The name "Post
+Litterbox got there first with essentially every idea this extension is built on: open a
+linked x.com post in a popup instead of going to the site; mark the links it can handle so
+you know before you click; fetch the post through the same API X uses for its own website
+embeds, so no cookies are sent; and leave a link out to X for when you do want the full
+thread. Post Peek's blue dot is Litterbox's marker in another shape, and the name "Post
 Peek" comes from Litterbox's App Store subtitle, "Post Peeker".
 
 Post Peek is a separate Chrome implementation of that idea, written from scratch. Litterbox

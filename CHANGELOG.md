@@ -9,8 +9,9 @@ and each released version is a git tag and a Chrome Web Store upload.
 
 - Documentation credits [Litterbox](https://andadinosaur.com/launch-litterbox) by name,
   author, and launch post in README.md, the store listing, and the 1.0.0 changelog entry,
-  and says plainly that Post Peek is a from-scratch Chrome implementation of that idea
-  rather than a port of it.
+  naming which of this extension's ideas are Litterbox's - the popup, the marker on
+  openable links, and the cookie-free embed fetch - and saying plainly that Post Peek is a
+  from-scratch Chrome implementation of them rather than a port.
 
 ## [1.1.4] - 2026-09-06
 
