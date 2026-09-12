@@ -30,34 +30,10 @@
   </tr>
 </table>
 
-## Credit
-
-Post Peek exists because of **Litterbox**, a Safari extension for iPhone, iPad, and Mac by
-Zhenyi Tan, who publishes as And a Dinosaur:
-
-- Launch post: [Launch: Litterbox](https://andadinosaur.com/launch-litterbox), 5 September 2026
-- App Store, free: [Litterbox - Post Peeker](https://apps.apple.com/us/app/litterbox-post-peeker/id6805719216)
-- Developer: [And a Dinosaur](https://andadinosaur.com)
-
-**If you use Safari, use Litterbox.** It came first, it is free, and it is the better fit on
-Apple platforms; Post Peek is for people on Chrome.
-
-Litterbox got there first with essentially every idea this extension is built on: open a
-linked x.com post in a popup instead of going to the site; mark the links it can handle so
-you know before you click; fetch the post through the same API X uses for its own website
-embeds, so no cookies are sent; and leave a link out to X for when you do want the full
-thread. Post Peek's blue dot is Litterbox's marker in another shape, and the name "Post
-Peek" is a clip of Litterbox's own listing name, "Litterbox - Post Peeker".
-
-Some of the words are theirs as well. "Read one X post and leave" is a compression of how
-Litterbox describes itself on the App Store - "opens x.com links in a popup so you can read
-the one post and leave."
-
-Post Peek is a separate Chrome implementation of that idea, written from scratch. Litterbox
-is closed source, so no Litterbox code or artwork is used here. Post Peek is not
-affiliated with, endorsed by, or supported by Zhenyi Tan, And a Dinosaur, or X Corp, so
-anything wrong with this extension is not theirs to answer for - report it on
-[this repository's issues](https://github.com/tsvb/post-peek/issues).
+Post Peek is an independent, open-source project inspired by
+[Litterbox](https://andadinosaur.com/launch-litterbox), the Safari extension by Zhenyi Tan
+(And a Dinosaur). If you use Safari, use Litterbox itself - it came first, it is free, and
+it is the better fit there. See [Credit](#credit).
 
 ## Features
 
@@ -124,6 +100,32 @@ zip to the Chrome Web Store.
 - `test.html` - page of links for checking dots and peeking by hand in the browser.
 - `media/` - banner and the cropped screenshots used above; regenerate with `npm run media`.
 - `store/` - Chrome Web Store listing copy, screenshots, and promo tiles.
+
+## Credit
+
+Post Peek exists because of **Litterbox**, a Safari extension for iPhone, iPad, and Mac by
+Zhenyi Tan, who publishes as And a Dinosaur:
+
+- Launch post: [Launch: Litterbox](https://andadinosaur.com/launch-litterbox), 5 September 2026
+- App Store, free: [Litterbox - Post Peeker](https://apps.apple.com/us/app/litterbox-post-peeker/id6805719216)
+- Developer: [And a Dinosaur](https://andadinosaur.com)
+
+Litterbox got there first with essentially every idea this extension is built on: open a
+linked x.com post in a popup instead of going to the site; mark the links it can handle so
+you know before you click; fetch the post through the same API X uses for its own website
+embeds, so no cookies are sent; and leave a link out to X for when you do want the full
+thread. Post Peek's blue dot is Litterbox's marker in another shape, and the name "Post
+Peek" is a clip of Litterbox's own listing name, "Litterbox - Post Peeker".
+
+Some of the words are theirs as well. "Read one X post and leave" is a compression of how
+Litterbox describes itself on the App Store - "opens x.com links in a popup so you can read
+the one post and leave."
+
+Post Peek is a separate Chrome implementation of that idea, written from scratch. Litterbox
+is closed source, so no Litterbox code or artwork is used here. Post Peek is not
+affiliated with, endorsed by, or supported by Zhenyi Tan, And a Dinosaur, or X Corp, so
+anything wrong with this extension is not theirs to answer for - report it on
+[this repository's issues](https://github.com/tsvb/post-peek/issues).
 
 ## License
 
