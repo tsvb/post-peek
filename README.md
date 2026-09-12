@@ -21,8 +21,8 @@
 
 <table>
   <tr>
-    <td width="50%"><img src="store/screenshot-2.png" alt="An article with two x.com links, each followed by a small blue dot."></td>
-    <td width="50%"><img src="store/screenshot-1.png" alt="The same article with the post open in a popup over the page, showing text, a photo, the date, and an Open on X button."></td>
+    <td width="50%"><img src="media/shot-links.png" alt="An article with two x.com links, each followed by a small blue dot."></td>
+    <td width="50%"><img src="media/shot-popup.png" alt="The same article with the post open in a popup over the page, showing text, a photo, the date, and an Open on X button."></td>
   </tr>
   <tr>
     <td align="center"><sub><b>A blue dot marks a link Post Peek can open.</b></sub></td>
@@ -73,8 +73,9 @@ npm run build
 
 This writes `dist/post-peek-<version>.zip` containing only the runtime files
 (`manifest.json`, `src/`, `options/`, `icons/`) - the banner and store art are not packaged.
-To regenerate artwork: `npm run icons` for the extension icons, `npm run banner` for the
-banner above. Both need Chrome; set `CHROME` if it is not on the default Windows path.
+To regenerate artwork: `npm run icons` for the extension icons, `npm run media` for the
+banner and screenshots above. Both need Chrome; set `CHROME` if it is not on the default
+Windows path.
 
 ## Releasing
 
@@ -94,10 +95,10 @@ zip to the Chrome Web Store.
 - `src/content.css` - dot marker, matched purely on the link's `href`.
 - `src/popup-css.js` - popup stylesheet embedded as a string (so nothing is web-accessible).
 - `options/` - settings page (also the toolbar popup).
-- `scripts/` - icon generator, README banner renderer, and zip builder.
+- `scripts/` - icon generator, README artwork renderer, and zip builder.
 - `test/` - dependency-free tests for the packaging and privacy invariants (`npm test`).
 - `test.html` - page of links for checking dots and peeking by hand in the browser.
-- `media/banner.png` - the banner at the top of this file; regenerate with `npm run banner`.
+- `media/` - banner and the cropped screenshots used above; regenerate with `npm run media`.
 - `store/` - Chrome Web Store listing copy, screenshots, and promo tiles.
 
 ## Credit

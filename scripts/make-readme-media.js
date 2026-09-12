@@ -1,5 +1,6 @@
-// Renders the README banner with headless Chrome.
-// Usage: node scripts/make-banner.js
+// Renders the README artwork with headless Chrome: the banner, and the store
+// screenshots cropped down to their content for the before/after pair.
+// Usage: node scripts/make-readme-media.js
 //
 // The design is authored at 1280x280 and every dimension is multiplied by SCALE,
 // so the PNG lands at 2x and stays crisp on retina screens. Note the 2x comes
@@ -72,12 +73,31 @@ body{font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Ar
 </div>
 </body></html>`;
 
-const file = path.join(__dirname, '..', 'media', 'banner.html');
-const out = path.join(__dirname, '..', 'media', 'banner.png');
-fs.mkdirSync(path.dirname(file), { recursive: true });
-fs.writeFileSync(file, html);
-execFileSync(CHROME, [...SANDBOX_FLAGS, '--headless=new', '--disable-gpu', '--hide-scrollbars',
-  `--window-size=${W},${H}`, '--force-device-scale-factor=1', '--virtual-time-budget=2000',
-  `--screenshot=${out}`, 'file:///' + file.replace(/\\/g, '/')], { stdio: 'ignore' });
-fs.unlinkSync(file);
-console.log(out, fs.statSync(out).size, 'bytes');
+const media = path.join(__dirname, '..', 'media');
+fs.mkdirSync(media, { recursive: true });
+
+function shoot(name, markup, w, h) {
+  const file = path.join(media, `${name}.html`);
+  const out = path.join(media, `${name}.png`);
+  fs.writeFileSync(file, markup);
+  execFileSync(CHROME, [...SANDBOX_FLAGS, '--headless=new', '--disable-gpu', '--hide-scrollbars',
+    `--window-size=${w},${h}`, '--force-device-scale-factor=1', '--virtual-time-budget=2000',
+    `--screenshot=${out}`, 'file:///' + file.replace(/\\/g, '/')], { stdio: 'ignore' });
+  fs.unlinkSync(file);
+  console.log(out, fs.statSync(out).size, 'bytes');
+}
+
+shoot('banner', html, W, H);
+
+// The store screenshots are 1280x800 because the Chrome Web Store requires that
+// size; the page content only fills the top of the frame, so the README uses
+// copies cropped to CROP_H. The store PNGs themselves are left untouched.
+const CROP_W = 1280;
+const CROP_H = 600;
+const crop = (src) => `<!doctype html><html><head><meta charset="utf-8"><style>
+*{box-sizing:border-box}html,body{margin:0;width:${CROP_W}px;height:${CROP_H}px;overflow:hidden}
+img{display:block;width:${CROP_W}px}
+</style></head><body><img src="../store/${src}"></body></html>`;
+
+shoot('shot-links', crop('screenshot-2.png'), CROP_W, CROP_H);
+shoot('shot-popup', crop('screenshot-1.png'), CROP_W, CROP_H);

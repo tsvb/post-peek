@@ -9,8 +9,9 @@ Repository documentation and artwork only. The packaged extension is unchanged.
 
 ### Added
 
-- README banner (`media/banner.png`) rendered by `scripts/make-banner.js` (`npm run banner`),
-  reusing the mark and gradient from the store tiles.
+- README artwork in `media/`, rendered by `scripts/make-readme-media.js` (`npm run media`):
+  a banner reusing the mark and gradient from the store tiles, and the two store
+  screenshots cropped to their content. The store PNGs stay 1280x800 for the dashboard.
 - The README leads with the banner, status badges, and the two store screenshots as a
   before/after pair.
 
