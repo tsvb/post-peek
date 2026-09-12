@@ -5,13 +5,25 @@ and each released version is a git tag and a Chrome Web Store upload.
 
 ## [Unreleased]
 
+Repository documentation and artwork only. The packaged extension is unchanged.
+
+### Added
+
+- README banner (`media/banner.png`) rendered by `scripts/make-banner.js` (`npm run banner`),
+  reusing the mark and gradient from the store tiles.
+- The README leads with the banner, status badges, and the two store screenshots as a
+  before/after pair.
+
 ### Changed
 
 - Documentation credits [Litterbox](https://andadinosaur.com/launch-litterbox) by name,
   author, and launch post in README.md, the store listing, and the 1.0.0 changelog entry,
   naming which of this extension's ideas are Litterbox's - the popup, the marker on
-  openable links, and the cookie-free embed fetch - and saying plainly that Post Peek is a
-  from-scratch Chrome implementation of them rather than a port.
+  openable links, the cookie-free embed fetch, the link out to X, the name, and the
+  tagline - and saying plainly that Post Peek is a from-scratch Chrome implementation of
+  them rather than a port.
+- Two feature lines were reworded away from Litterbox's own App Store copy, which they had
+  been echoing almost verbatim.
 
 ## [1.1.4] - 2026-09-06
 
@@ -102,7 +114,8 @@ Repository and test changes only. The packaged extension - `manifest.json`, `src
   [Litterbox](https://andadinosaur.com/launch-litterbox), the Safari extension by Zhenyi Tan
   (And a Dinosaur), written from scratch rather than ported - Litterbox is closed source.
   Clicking an x.com or twitter.com post link opens the post in a popup rendered in a closed
-  Shadow DOM, using the same syndication API that powers X's embed widgets. Renders text,
+  Shadow DOM, using X's public syndication endpoint, the one behind X's own embedded posts.
+  Renders text,
   photos, video, link cards, quoted posts, and reply context. Openable links get a small
   blue dot. Options page for toggling peeking, dots, and the popup theme.
 - Dependency-free zip builder (`npm run build`) and icon generator (`npm run icons`),
