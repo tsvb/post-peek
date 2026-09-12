@@ -3,6 +3,15 @@
 All notable changes to Post Peek. Versions follow [semantic versioning](https://semver.org/),
 and each released version is a git tag and a Chrome Web Store upload.
 
+## [Unreleased]
+
+### Changed
+
+- Documentation credits [Litterbox](https://andadinosaur.com/launch-litterbox) by name,
+  author, and launch post in README.md, the store listing, and the 1.0.0 changelog entry,
+  and says plainly that Post Peek is a from-scratch Chrome implementation of that idea
+  rather than a port of it.
+
 ## [1.1.4] - 2026-09-06
 
 Repository and test changes only. The packaged extension - `manifest.json`, `src/`,
@@ -88,8 +97,9 @@ Repository and test changes only. The packaged extension - `manifest.json`, `src
 
 ### Added
 
-- First release: a Chrome MV3 port of the Safari extension
-  [Litterbox - Post Peeker](https://apps.apple.com/us/app/litterbox-post-peeker/id6805719216).
+- First release: an independent Chrome MV3 take on
+  [Litterbox](https://andadinosaur.com/launch-litterbox), the Safari extension by Zhenyi Tan
+  (And a Dinosaur), written from scratch rather than ported - Litterbox is closed source.
   Clicking an x.com or twitter.com post link opens the post in a popup rendered in a closed
   Shadow DOM, using the same syndication API that powers X's embed widgets. Renders text,
   photos, video, link cards, quoted posts, and reply context. Openable links get a small
@@ -98,6 +108,7 @@ Repository and test changes only. The packaged extension - `manifest.json`, `src
   a release workflow that checks the tag against the manifest version and attaches the
   zip to a GitHub release, and Chrome Web Store listing copy, screenshots, and promo tiles.
 
+[Unreleased]: https://github.com/tsvb/post-peek/compare/v1.1.4...HEAD
 [1.1.4]: https://github.com/tsvb/post-peek/releases/tag/v1.1.4
 [1.1.3]: https://github.com/tsvb/post-peek/releases/tag/v1.1.3
 [1.1.2]: https://github.com/tsvb/post-peek/releases/tag/v1.1.2

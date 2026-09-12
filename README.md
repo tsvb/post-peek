@@ -3,9 +3,10 @@
 Read one X post and leave. A Chrome (Manifest V3) extension that opens x.com and
 twitter.com post links in a popup instead of sending you to the full site.
 
-Post Peek is an independent, open-source project inspired by the Safari extension
-[Litterbox - Post Peeker](https://apps.apple.com/us/app/litterbox-post-peeker/id6805719216)
-by And a Dinosaur. It is not affiliated with that project or with X Corp.
+Post Peek is an independent, open-source project inspired by
+[Litterbox](https://andadinosaur.com/launch-litterbox), the Safari extension by Zhenyi Tan
+(And a Dinosaur). If you use Safari on iOS or macOS, use Litterbox itself - it came first,
+it is free, and it is the better fit there. See [Credit](#credit).
 
 ## Features
 
@@ -67,6 +68,26 @@ zip to the Chrome Web Store.
 - `scripts/` - icon generator and zip builder.
 - `test/` - dependency-free tests for the packaging and privacy invariants (`npm test`).
 - `test.html` - page of links for checking dots and peeking by hand in the browser.
+
+## Credit
+
+Post Peek exists because of **Litterbox**, a Safari extension for iOS and macOS by
+Zhenyi Tan, who publishes as And a Dinosaur:
+
+- Launch post: [Launch: Litterbox](https://andadinosaur.com/launch-litterbox)
+- App Store, free: [Litterbox - Post Peeker](https://apps.apple.com/us/app/litterbox-post-peeker/id6805719216)
+- Developer: [And a Dinosaur](https://andadinosaur.com)
+
+Litterbox got there first with both halves of the idea this extension is built on: open a
+linked x.com post in a popup instead of going to the site, and fetch that post through the
+same public embed API X uses for its own embeds, so no cookies are sent. The name "Post
+Peek" comes from Litterbox's App Store subtitle, "Post Peeker".
+
+Post Peek is a separate Chrome implementation of that idea, written from scratch. Litterbox
+is closed source, and none of its code, assets, or text is used here. Post Peek is not
+affiliated with, endorsed by, or supported by Zhenyi Tan, And a Dinosaur, or X Corp, so
+anything wrong with this extension is not theirs to answer for - report it on
+[this repository's issues](https://github.com/tsvb/post-peek/issues).
 
 ## License
 

@@ -52,7 +52,10 @@ Posts from protected accounts, age-restricted posts, and deleted posts cannot be
 Post Peek is open source under the MIT license:
 https://github.com/tsvb/post-peek
 
-It is an independent project inspired by the Safari extension Litterbox - Post Peeker by And a Dinosaur. It is not affiliated with that project or with X Corp.
+Post Peek is an independent project inspired by Litterbox, the Safari extension for iOS and macOS by Zhenyi Tan (And a Dinosaur). Litterbox is the original, it is free, and if you use Safari you should use it instead:
+https://andadinosaur.com/launch-litterbox
+
+Post Peek is a separate Chrome implementation of the same idea, written from scratch. It is not affiliated with, endorsed by, or supported by Litterbox, And a Dinosaur, or X Corp.
 
 ## Privacy practices tab
 
