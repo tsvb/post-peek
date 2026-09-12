@@ -115,3 +115,4 @@ until they are done:
 
 - Homepage URL: https://github.com/tsvb/post-peek
 - Support URL: https://github.com/tsvb/post-peek/issues
+- Published listing: https://chromewebstore.google.com/detail/nkjjgbkfdaembjfandhlgfijhbigblnn

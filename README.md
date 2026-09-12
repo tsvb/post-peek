@@ -4,8 +4,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/tsvb/post-peek/releases"><img
-     alt="Latest release" src="https://img.shields.io/github/v/release/tsvb/post-peek?style=flat-square&color=1d9bf0&label=release"></a>
+  <a href="https://chromewebstore.google.com/detail/nkjjgbkfdaembjfandhlgfijhbigblnn"><img
+     alt="Chrome Web Store" src="https://img.shields.io/chrome-web-store/v/nkjjgbkfdaembjfandhlgfijhbigblnn?style=flat-square&color=1d9bf0&label=chrome%20web%20store"></a>
   <a href="LICENSE"><img
      alt="MIT license" src="https://img.shields.io/badge/license-MIT-1d9bf0?style=flat-square"></a>
   <img alt="Manifest V3" src="https://img.shields.io/badge/Chrome-Manifest%20V3-1d9bf0?style=flat-square">
@@ -17,6 +17,11 @@
   <b>Read one X post and leave.</b><br>
   A Chrome (Manifest V3) extension that opens x.com and twitter.com post links in a popup
   instead of sending you to the full site.
+</p>
+
+<p align="center">
+  <a href="https://chromewebstore.google.com/detail/nkjjgbkfdaembjfandhlgfijhbigblnn"><img
+     alt="Add to Chrome" src="https://img.shields.io/badge/Add%20to%20Chrome-1d9bf0?style=for-the-badge&logo=googlechrome&logoColor=white"></a>
 </p>
 
 <table>
@@ -48,7 +53,12 @@ it is the better fit there. See [Credit](#credit).
 - Settings stay on your device (`chrome.storage.local`, never synced).
 - No data collection. See [PRIVACY.md](PRIVACY.md).
 
-## Install from source
+## Install
+
+[**Add to Chrome from the Chrome Web Store**](https://chromewebstore.google.com/detail/nkjjgbkfdaembjfandhlgfijhbigblnn) - the reviewed build, kept up to date
+by Chrome.
+
+### From source
 
 1. Open `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and pick this folder.
 2. Serve this folder over HTTP and open the test page, for example:

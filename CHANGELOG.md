@@ -9,6 +9,10 @@ Repository documentation and artwork only. The packaged extension is unchanged.
 
 ### Added
 
+- Install links to the published Chrome Web Store listing: an Add to Chrome button under
+  the tagline, a store-version badge in place of the GitHub release badge, and an `Install`
+  section that leads with the store and keeps loading unpacked as a subsection for
+  development. The listing URL is also recorded in `store/LISTING.md`.
 - README artwork in `media/`, rendered by `scripts/make-readme-media.js` (`npm run media`):
   a banner reusing the mark and gradient from the store tiles, and the two store
   screenshots cropped to their content. The store PNGs stay 1280x800 for the dashboard.
