@@ -13,7 +13,8 @@ Repository documentation and artwork only. The packaged extension is unchanged.
   a banner reusing the mark and gradient from the store tiles, and the two store
   screenshots cropped to their content. The store PNGs stay 1280x800 for the dashboard.
 - The README leads with the banner, status badges, and the two store screenshots as a
-  before/after pair.
+  before/after pair, with the credit to Litterbox directly under them rather than at the
+  foot of the file.
 
 ### Changed
 
