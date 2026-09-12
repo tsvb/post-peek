@@ -83,7 +83,7 @@ linked x.com post in a popup instead of going to the site; mark the links it can
 you know before you click; fetch the post through the same API X uses for its own website
 embeds, so no cookies are sent; and leave a link out to X for when you do want the full
 thread. Post Peek's blue dot is Litterbox's marker in another shape, and the name "Post
-Peek" comes from Litterbox's App Store subtitle, "Post Peeker".
+Peek" comes from Litterbox's, which is listed as "Litterbox - Post Peeker".
 
 Post Peek is a separate Chrome implementation of that idea, written from scratch. Litterbox
 is closed source, and none of its code, assets, or text is used here. Post Peek is not
