@@ -3,12 +3,30 @@
 All notable changes to Post Peek. Versions follow [semantic versioning](https://semver.org/),
 and each released version is a git tag and a Chrome Web Store upload.
 
-## [Unreleased]
+## [1.2.0] - 2026-09-13
 
-Repository documentation and artwork only. The packaged extension is unchanged.
+First release for Firefox. Requested in [#3](https://github.com/tsvb/post-peek/issues/3).
 
 ### Added
 
+- Firefox support. `npm run build` now also writes `dist/post-peek-<version>-firefox.zip`,
+  the same files with the manifest rewritten by `scripts/firefox-manifest.js`: Firefox has
+  no background service workers, so `src/background.js` runs as an event page instead, and
+  the manifest carries the add-on ID (`post-peek@timvbs.com`), a minimum of Firefox 140,
+  and the `data_collection_permissions: none` declaration addons.mozilla.org requires. The
+  checked-in `manifest.json` is unchanged, so the Chrome zip is byte-for-byte what it was.
+- The popup stylesheet falls back to a `<style>` inside the closed shadow root when
+  `adoptedStyleSheets` cannot be assigned. Firefox before 153 rejects that assignment from
+  a content script (Firefox bug 1751346). The fallback is still invisible to the page;
+  the one difference is that on those older Firefox versions a host page with a strict
+  `style-src` policy can block it, leaving the popup unstyled there.
+- The "reload this page" hint also recognises Firefox's wording when the extension has
+  been updated under an open page.
+- Tests for the Firefox manifest rewrite and the stylesheet fallback, and the release
+  workflow runs `web-ext lint` (the addons.mozilla.org validator) on the Firefox zip and
+  attaches both zips to the GitHub release.
+- `store/LISTING-FIREFOX.md`, the addons.mozilla.org listing copy and submission notes,
+  alongside the Chrome one.
 - Install links to the published Chrome Web Store listing: an Add to Chrome button under
   the tagline, a store-version badge in place of the GitHub release badge, and an `Install`
   section that leads with the store and keeps loading unpacked as a subsection for

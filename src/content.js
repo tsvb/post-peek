@@ -43,7 +43,15 @@
     if (host) return;
     host = document.createElement('post-peek-host');
     shadow = host.attachShadow({ mode: 'closed' });
-    shadow.adoptedStyleSheets = [loadCss()];
+    try {
+      shadow.adoptedStyleSheets = [loadCss()];
+    } catch {
+      // Firefox before 153 cannot assign adoptedStyleSheets from a content
+      // script (Xray wrappers, Firefox bug 1751346). A <style> inside the
+      // closed shadow root is still invisible to the page; the one cost is
+      // that a host page with a strict style-src CSP can block it there.
+      shadow.append(el('style', { text: POST_PEEK_CSS }));
+    }
     applyTheme();
     (document.body || document.documentElement).appendChild(host);
   }
@@ -300,7 +308,7 @@
     if (code === 'POST_NOT_FOUND') msg = 'This post does not exist or was deleted.';
     else if (code === 'POST_UNAVAILABLE') msg = 'This post is unavailable to embed (it may be from a protected account, age-restricted, or removed).';
     else if (/^HTTP_/.test(code)) msg = `X returned an error (${code.replace('HTTP_', 'HTTP ')}).`;
-    else if (/Extension context invalidated/i.test(code)) msg = 'Post Peek was updated. Reload this page to keep peeking.';
+    else if (/Extension context invalidated|receiving end does not exist/i.test(code)) msg = 'Post Peek was updated. Reload this page to keep peeking.';
     return el('div', { class: 'lb-status' }, [
       el('div', { text: msg }),
       el('div', {}, extLink(url, 'Open on X', { class: 'lb-open' })),
