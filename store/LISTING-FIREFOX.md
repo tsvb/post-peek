@@ -125,7 +125,11 @@ First Firefox release. Same features as the Chrome extension.
 ## Assets
 
 - Icon: `icons/icon128.png` (AMO accepts 128x128 PNG and scales it)
-- Screenshots: `store/screenshot-1.png`, `store/screenshot-2.png` (1280x800)
+- Screenshots (1280x800), in this order so they read as before and after:
+  1. `store/screenshot-2.png`: A small blue dot marks every post link Post Peek can open,
+     so you know before you click.
+  2. `store/screenshot-1.png`: Click the link and the post opens in place: text, media,
+     date, and an Open on X button. Press Esc to close and keep reading.
 
 ## Releasing updates
 
