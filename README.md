@@ -58,7 +58,8 @@ it is the better fit there. See [Credit](#credit).
 [**Add to Chrome from the Chrome Web Store**](https://chromewebstore.google.com/detail/nkjjgbkfdaembjfandhlgfijhbigblnn) - the reviewed build, kept up to date
 by Chrome.
 
-Firefox: the add-on is not on addons.mozilla.org yet. Until it is, download
+Firefox: the add-on is being submitted to addons.mozilla.org; this section will link the
+listing once it is live. Until then, download
 `post-peek-<version>-firefox.zip` from the [latest release](https://github.com/tsvb/post-peek/releases)
 or build it from source as below. Firefox 140 or newer is required.
 
@@ -129,7 +130,7 @@ addons.mozilla.org.
 - `test/` - dependency-free tests for the packaging and privacy invariants (`npm test`).
 - `test.html` - page of links for checking dots and peeking by hand in the browser.
 - `media/` - banner and the cropped screenshots used above; regenerate with `npm run media`.
-- `store/` - Chrome Web Store listing copy, screenshots, and promo tiles (the same copy serves the AMO listing).
+- `store/` - Chrome Web Store and addons.mozilla.org listing copy, screenshots, and promo tiles.
 
 ## Credit
 

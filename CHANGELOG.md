@@ -3,7 +3,9 @@
 All notable changes to Post Peek. Versions follow [semantic versioning](https://semver.org/),
 and each released version is a git tag and a Chrome Web Store upload.
 
-## [Unreleased]
+## [1.2.0] - 2026-09-13
+
+First release for Firefox. Requested in [#3](https://github.com/tsvb/post-peek/issues/3).
 
 ### Added
 
@@ -23,6 +25,8 @@ and each released version is a git tag and a Chrome Web Store upload.
 - Tests for the Firefox manifest rewrite and the stylesheet fallback, and the release
   workflow runs `web-ext lint` (the addons.mozilla.org validator) on the Firefox zip and
   attaches both zips to the GitHub release.
+- `store/LISTING-FIREFOX.md`, the addons.mozilla.org listing copy and submission notes,
+  alongside the Chrome one.
 - Install links to the published Chrome Web Store listing: an Add to Chrome button under
   the tagline, a store-version badge in place of the GitHub release badge, and an `Install`
   section that leads with the store and keeps loading unpacked as a subsection for
