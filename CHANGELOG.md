@@ -3,6 +3,14 @@
 All notable changes to Post Peek. Versions follow [semantic versioning](https://semver.org/),
 and each released version is a git tag and a Chrome Web Store upload.
 
+## [Unreleased]
+
+Repository documentation only. The packaged extension is unchanged.
+
+### Added
+
+- Links to the addons.mozilla.org listing in README.md and `store/LISTING-FIREFOX.md`.
+
 ## [1.2.0] - 2026-09-13
 
 First release for Firefox. Requested in [#3](https://github.com/tsvb/post-peek/issues/3).

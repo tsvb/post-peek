@@ -135,4 +135,7 @@ archive, and repeat the version notes from CHANGELOG.md.
 
 ## Published listing
 
-Not yet live. Record the URL here and in README.md once it is.
+https://addons.mozilla.org/firefox/addon/post-peek/
+
+Submitted 13 September 2026 as 1.2.0 (add-on ID `post-peek@timvbs.com`, support email
+postpeek@timvbs.com). The page is public once the first review is approved.

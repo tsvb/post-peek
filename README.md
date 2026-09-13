@@ -6,6 +6,8 @@
 <p align="center">
   <a href="https://chromewebstore.google.com/detail/nkjjgbkfdaembjfandhlgfijhbigblnn"><img
      alt="Chrome Web Store" src="https://img.shields.io/chrome-web-store/v/nkjjgbkfdaembjfandhlgfijhbigblnn?style=flat-square&color=1d9bf0&label=chrome%20web%20store"></a>
+  <a href="https://addons.mozilla.org/firefox/addon/post-peek/"><img
+     alt="Firefox Add-ons" src="https://img.shields.io/amo/v/post-peek?style=flat-square&color=1d9bf0&label=firefox%20add-ons"></a>
   <a href="LICENSE"><img
      alt="MIT license" src="https://img.shields.io/badge/license-MIT-1d9bf0?style=flat-square"></a>
   <img alt="Manifest V3" src="https://img.shields.io/badge/Chrome%20%2B%20Firefox-Manifest%20V3-1d9bf0?style=flat-square">
@@ -22,6 +24,8 @@
 <p align="center">
   <a href="https://chromewebstore.google.com/detail/nkjjgbkfdaembjfandhlgfijhbigblnn"><img
      alt="Add to Chrome" src="https://img.shields.io/badge/Add%20to%20Chrome-1d9bf0?style=for-the-badge&logo=googlechrome&logoColor=white"></a>
+  <a href="https://addons.mozilla.org/firefox/addon/post-peek/"><img
+     alt="Add to Firefox" src="https://img.shields.io/badge/Add%20to%20Firefox-1d9bf0?style=for-the-badge&logo=firefox&logoColor=white"></a>
 </p>
 
 <table>
@@ -58,10 +62,10 @@ it is the better fit there. See [Credit](#credit).
 [**Add to Chrome from the Chrome Web Store**](https://chromewebstore.google.com/detail/nkjjgbkfdaembjfandhlgfijhbigblnn) - the reviewed build, kept up to date
 by Chrome.
 
-Firefox: the add-on is being submitted to addons.mozilla.org; this section will link the
-listing once it is live. Until then, download
-`post-peek-<version>-firefox.zip` from the [latest release](https://github.com/tsvb/post-peek/releases)
-or build it from source as below. Firefox 140 or newer is required.
+[**Add to Firefox from addons.mozilla.org**](https://addons.mozilla.org/firefox/addon/post-peek/) -
+Firefox 140 or newer. The listing goes public once Mozilla's first review is done; until
+then, download `post-peek-<version>-firefox.zip` from the
+[latest release](https://github.com/tsvb/post-peek/releases) or build it from source as below.
 
 ### From source
 
