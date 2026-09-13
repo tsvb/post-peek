@@ -14,6 +14,8 @@ const pkg = JSON.parse(read('package.json'));
 const contentJs = read('src/content.js');
 const contentCss = read('src/content.css');
 const backgroundJs = read('src/background.js');
+const { toFirefoxManifest } = require('../scripts/firefox-manifest');
+const firefoxManifest = toFirefoxManifest(manifest);
 
 const MEDIA_HOSTS = ['pbs.twimg.com', 'video.twimg.com'];
 const PREFIXES = ['', 'www.', 'mobile.', 'm.'];
@@ -95,6 +97,7 @@ test('every file the manifest references exists', () => {
   const refs = new Set([
     ...Object.values(manifest.icons),
     manifest.background.service_worker,
+    ...firefoxManifest.background.scripts,
     ...cs.js,
     ...cs.css,
     manifest.options_ui.page,
@@ -103,6 +106,42 @@ test('every file the manifest references exists', () => {
   for (const f of refs) {
     assert.ok(fs.existsSync(path.join(root, f)), `missing ${f}`);
   }
+});
+
+// ---------------------------------------------------------------- firefox
+
+// The Firefox zip is the Chrome zip with only the manifest rewritten, and the
+// rewrite must touch nothing but the background key and the gecko block.
+test('the Firefox manifest differs from Chrome only where Firefox requires', () => {
+  assert.deepStrictEqual(firefoxManifest.background, { scripts: [manifest.background.service_worker] });
+  assert.ok(!('service_worker' in firefoxManifest.background), 'Firefox has no service workers');
+
+  const gecko = firefoxManifest.browser_specific_settings.gecko;
+  assert.match(gecko.id, /^[^@\s]+@[^@\s]+$/, 'gecko.id must be email-shaped');
+  assert.match(gecko.strict_min_version, /^\d+\.\d+$/);
+  assert.ok(Number(gecko.strict_min_version) >= 127, 'MV3 host permissions are install-time only from Firefox 127');
+  // AMO requires this for new submissions; "none" is the claim PRIVACY.md makes.
+  assert.deepStrictEqual(gecko.data_collection_permissions, { required: ['none'] });
+
+  const rest = { ...firefoxManifest };
+  delete rest.background;
+  delete rest.browser_specific_settings;
+  const chromeRest = { ...manifest };
+  delete chromeRest.background;
+  assert.deepStrictEqual(rest, chromeRest);
+});
+
+test('the Chrome manifest carries no Firefox-only keys', () => {
+  assert.ok(!('browser_specific_settings' in manifest));
+  assert.ok(!('scripts' in manifest.background));
+});
+
+// Firefox before 153 throws on adoptedStyleSheets from a content script, so
+// the popup must fall back to a <style> in the closed shadow root.
+test('popup styling falls back to a <style> when adoptedStyleSheets throws', () => {
+  const fn = extractFn(contentJs, 'ensureHost');
+  assert.match(fn, /try\s*\{[^}]*adoptedStyleSheets[^}]*\}\s*catch/);
+  assert.match(fn, /el\('style', \{ text: POST_PEEK_CSS \}\)/);
 });
 
 // -------------------------------------------------------------- dot marker

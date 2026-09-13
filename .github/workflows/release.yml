@@ -39,7 +39,18 @@ jobs:
         run: npm run build
 
       - name: Verify zip contents
-        run: unzip -l "dist/post-peek-${{ steps.manifest.outputs.version }}.zip"
+        run: |
+          unzip -l "dist/post-peek-${{ steps.manifest.outputs.version }}.zip"
+          unzip -l "dist/post-peek-${{ steps.manifest.outputs.version }}-firefox.zip"
+
+      # The same validator addons.mozilla.org runs at upload time. Errors fail the
+      # build; warnings do not, because the minimum Firefox version (140, the ESR)
+      # predates Firefox for Android learning the data-collection key, which those
+      # two Android releases ignore harmlessly.
+      - name: Lint the Firefox zip
+        run: |
+          unzip -q "dist/post-peek-${{ steps.manifest.outputs.version }}-firefox.zip" -d firefox-unpacked
+          npx --yes web-ext lint --source-dir=firefox-unpacked
 
       - uses: actions/upload-artifact@v6
         with:
@@ -52,11 +63,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          zip="dist/post-peek-${{ steps.manifest.outputs.version }}.zip"
+          chrome="dist/post-peek-${{ steps.manifest.outputs.version }}.zip"
+          firefox="dist/post-peek-${{ steps.manifest.outputs.version }}-firefox.zip"
           if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
-            gh release upload "$GITHUB_REF_NAME" "$zip" --clobber
+            gh release upload "$GITHUB_REF_NAME" "$chrome" "$firefox" --clobber
           else
-            gh release create "$GITHUB_REF_NAME" "$zip" \
+            gh release create "$GITHUB_REF_NAME" "$chrome" "$firefox" \
               --title "Post Peek ${{ steps.manifest.outputs.version }}" \
               --generate-notes
           fi

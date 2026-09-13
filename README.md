@@ -1,6 +1,6 @@
 <p align="center">
   <img src="media/banner.png" width="820"
-       alt="Post Peek - read one X post and leave. A Chrome extension that opens post links in a popup, not the full site.">
+       alt="Post Peek - read one X post and leave. A Chrome and Firefox extension that opens post links in a popup, not the full site.">
 </p>
 
 <p align="center">
@@ -8,15 +8,15 @@
      alt="Chrome Web Store" src="https://img.shields.io/chrome-web-store/v/nkjjgbkfdaembjfandhlgfijhbigblnn?style=flat-square&color=1d9bf0&label=chrome%20web%20store"></a>
   <a href="LICENSE"><img
      alt="MIT license" src="https://img.shields.io/badge/license-MIT-1d9bf0?style=flat-square"></a>
-  <img alt="Manifest V3" src="https://img.shields.io/badge/Chrome-Manifest%20V3-1d9bf0?style=flat-square">
+  <img alt="Manifest V3" src="https://img.shields.io/badge/Chrome%20%2B%20Firefox-Manifest%20V3-1d9bf0?style=flat-square">
   <a href="PRIVACY.md"><img
      alt="No tracking" src="https://img.shields.io/badge/tracking-none-1d9bf0?style=flat-square"></a>
 </p>
 
 <p align="center">
   <b>Read one X post and leave.</b><br>
-  A Chrome (Manifest V3) extension that opens x.com and twitter.com post links in a popup
-  instead of sending you to the full site.
+  A Chrome and Firefox (Manifest V3) extension that opens x.com and twitter.com post links
+  in a popup instead of sending you to the full site.
 </p>
 
 <p align="center">
@@ -50,7 +50,7 @@ it is the better fit there. See [Credit](#credit).
   cannot tie a peek to your account or learn which site you were reading. No account needed.
 - Never scans the page or touches its links. The dot is pure CSS; only the clicked link is inspected.
 - Nothing for websites to probe: no web-accessible resources, and with dots turned off nothing whatsoever is written to the page.
-- Settings stay on your device (`chrome.storage.local`, never synced).
+- Settings stay on your device (local extension storage, never synced).
 - No data collection. See [PRIVACY.md](PRIVACY.md).
 
 ## Install
@@ -58,9 +58,19 @@ it is the better fit there. See [Credit](#credit).
 [**Add to Chrome from the Chrome Web Store**](https://chromewebstore.google.com/detail/nkjjgbkfdaembjfandhlgfijhbigblnn) - the reviewed build, kept up to date
 by Chrome.
 
+Firefox: the add-on is not on addons.mozilla.org yet. Until it is, download
+`post-peek-<version>-firefox.zip` from the [latest release](https://github.com/tsvb/post-peek/releases)
+or build it from source as below. Firefox 140 or newer is required.
+
 ### From source
 
-1. Open `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and pick this folder.
+1. Chrome: open `chrome://extensions`, enable **Developer mode**, click **Load unpacked**,
+   and pick this folder.
+
+   Firefox: run `npm run build`, open `about:debugging#/runtime/this-firefox`, click
+   **Load Temporary Add-on**, and pick `dist/post-peek-<version>-firefox.zip`. (Picking
+   `manifest.json` in this folder does not work: that file is the Chrome manifest, and
+   Firefox needs the rewritten one inside the zip.)
 2. Serve this folder over HTTP and open the test page, for example:
 
    ```bash
@@ -75,14 +85,23 @@ by Chrome.
 - Esc or clicking the backdrop closes the popup. Quoted posts and "Replying to" open in the same popup.
 - Toolbar button: toggle peeking, the dot marker, and the popup theme.
 
-## Building for the Chrome Web Store
+## Building for the stores
 
 ```bash
 npm run build
 ```
 
-This writes `dist/post-peek-<version>.zip` containing only the runtime files
-(`manifest.json`, `src/`, `options/`, `icons/`) - the banner and store art are not packaged.
+This writes two zips containing only the runtime files (`manifest.json`, `src/`,
+`options/`, `icons/`) - the banner and store art are not packaged:
+
+- `dist/post-peek-<version>.zip` for the Chrome Web Store, with `manifest.json` as checked in.
+- `dist/post-peek-<version>-firefox.zip` for addons.mozilla.org. Same files, but the manifest
+  is rewritten by `scripts/firefox-manifest.js`: Firefox runs `src/background.js` as an
+  event page rather than a service worker, and the manifest carries the add-on ID, the
+  minimum Firefox version, and the data-collection declaration AMO requires.
+
+To check the Firefox zip the way AMO will, unzip it and run `npx web-ext lint` on the
+folder; the release workflow does this on every tag.
 To regenerate artwork: `npm run icons` for the extension icons, `npm run media` for the
 banner and screenshots above. Both need Chrome; set `CHROME` if it is not on the default
 Windows path.
@@ -94,22 +113,23 @@ Windows path.
 3. Tag and push: `git tag v1.2.3 && git push origin v1.2.3`.
 
 The [release workflow](.github/workflows/release.yml) checks that the tag matches the
-manifest version, builds the zip, and attaches it to a GitHub release. Upload that same
-zip to the Chrome Web Store.
+manifest version, builds both zips, lints the Firefox one, and attaches both to a GitHub
+release. Upload the plain zip to the Chrome Web Store and the `-firefox` zip to
+addons.mozilla.org.
 
 ## Layout
 
-- `manifest.json` - MV3 manifest.
-- `src/background.js` - service worker; fetches posts from `cdn.syndication.twimg.com` and proxies images when a page's CSP blocks `twimg.com`.
+- `manifest.json` - MV3 manifest for Chrome. The Firefox manifest is derived from it at build time.
+- `src/background.js` - service worker (event page on Firefox); fetches posts from `cdn.syndication.twimg.com` and proxies images when a page's CSP blocks `twimg.com`.
 - `src/content.js` - intercepts clicks on post links and renders the popup inside a closed Shadow DOM.
 - `src/content.css` - dot marker, matched purely on the link's `href`.
 - `src/popup-css.js` - popup stylesheet embedded as a string (so nothing is web-accessible).
 - `options/` - settings page (also the toolbar popup).
-- `scripts/` - icon generator, README artwork renderer, and zip builder.
+- `scripts/` - icon generator, README artwork renderer, zip builder, and the Chrome-to-Firefox manifest rewrite.
 - `test/` - dependency-free tests for the packaging and privacy invariants (`npm test`).
 - `test.html` - page of links for checking dots and peeking by hand in the browser.
 - `media/` - banner and the cropped screenshots used above; regenerate with `npm run media`.
-- `store/` - Chrome Web Store listing copy, screenshots, and promo tiles.
+- `store/` - Chrome Web Store listing copy, screenshots, and promo tiles (the same copy serves the AMO listing).
 
 ## Credit
 
@@ -131,7 +151,7 @@ Some of the words are theirs as well. "Read one X post and leave" is a compressi
 Litterbox describes itself on the App Store - "opens x.com links in a popup so you can read
 the one post and leave."
 
-Post Peek is a separate Chrome implementation of that idea, written from scratch. Litterbox
+Post Peek is a separate Chrome and Firefox implementation of that idea, written from scratch. Litterbox
 is closed source, so no Litterbox code or artwork is used here. Post Peek is not
 affiliated with, endorsed by, or supported by Zhenyi Tan, And a Dinosaur, or X Corp, so
 anything wrong with this extension is not theirs to answer for - report it on
