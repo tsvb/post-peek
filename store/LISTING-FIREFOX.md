@@ -142,4 +142,4 @@ archive, and repeat the version notes from CHANGELOG.md.
 https://addons.mozilla.org/firefox/addon/post-peek/
 
 Submitted 13 September 2026 as 1.2.0 (add-on ID `post-peek@timvbs.com`, support email
-postpeek@timvbs.com). The page is public once the first review is approved.
+postpeek@timvbs.com). Approved by Mozilla; confirmed public on 16 September 2026.

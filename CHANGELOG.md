@@ -1,7 +1,7 @@
 # Changelog
 
 All notable changes to Post Peek. Versions follow [semantic versioning](https://semver.org/),
-and each released version is a git tag and a Chrome Web Store upload.
+and each released version is a git tag and an upload to the Chrome Web Store and addons.mozilla.org.
 
 ## [Unreleased]
 
@@ -10,6 +10,12 @@ Repository documentation only. The packaged extension is unchanged.
 ### Added
 
 - Links to the addons.mozilla.org listing in README.md and `store/LISTING-FIREFOX.md`.
+
+### Changed
+
+- The addons.mozilla.org listing passed Mozilla's review and is public. README.md now points
+  Firefox users straight to it instead of the release zip, and `store/LISTING-FIREFOX.md`
+  records the approval.
 
 ## [1.2.0] - 2026-09-13
 

@@ -63,9 +63,7 @@ it is the better fit there. See [Credit](#credit).
 by Chrome.
 
 [**Add to Firefox from addons.mozilla.org**](https://addons.mozilla.org/firefox/addon/post-peek/) -
-Firefox 140 or newer. The listing goes public once Mozilla's first review is done; until
-then, download `post-peek-<version>-firefox.zip` from the
-[latest release](https://github.com/tsvb/post-peek/releases) or build it from source as below.
+the reviewed build, kept up to date by Firefox. Requires Firefox 140 or newer.
 
 ### From source
 
