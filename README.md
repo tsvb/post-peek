@@ -163,3 +163,5 @@ anything wrong with this extension is not theirs to answer for - report it on
 ## License
 
 [MIT](LICENSE)
+
+Made by [Tim VanBenschoten](https://timvanbenschoten.com).
