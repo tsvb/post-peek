@@ -93,7 +93,7 @@ The popup, the marker on links that can be opened, and the cookie-free fetching 
 
 - Support email: the address on the Chrome listing.
 - Support website: https://github.com/tsvb/post-peek/issues
-- Homepage: https://github.com/tsvb/post-peek
+- Homepage: https://timvanbenschoten.com/code/post-peek
 
 ## License
 

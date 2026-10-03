@@ -70,5 +70,6 @@ jobs:
           else
             gh release create "$GITHUB_REF_NAME" "$chrome" "$firefox" \
               --title "Post Peek ${{ steps.manifest.outputs.version }}" \
+              --notes "Project page: https://timvanbenschoten.com/code/post-peek" \
               --generate-notes
           fi
