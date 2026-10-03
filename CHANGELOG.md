@@ -5,11 +5,16 @@ and each released version is a git tag and an upload to the Chrome Web Store and
 
 ## [Unreleased]
 
-Repository documentation only. The packaged extension is unchanged.
+The packaged extension changes only in its manifest, which now names a homepage. The rest is
+repository documentation.
 
 ### Added
 
 - Links to the addons.mozilla.org listing in README.md and `store/LISTING-FIREFOX.md`.
+- `homepage_url` in the manifest: the project page,
+  [timvanbenschoten.com/code/post-peek](https://timvanbenschoten.com/code/post-peek), which
+  Chrome and Firefox link from the extension's details. The store listing notes use it as the
+  homepage too, and GitHub releases made by the release workflow start with a "Project page" line.
 
 ### Changed
 

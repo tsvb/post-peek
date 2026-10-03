@@ -113,6 +113,6 @@ until they are done:
 
 ## Support
 
-- Homepage URL: https://github.com/tsvb/post-peek
+- Homepage URL: https://timvanbenschoten.com/code/post-peek
 - Support URL: https://github.com/tsvb/post-peek/issues
 - Published listing: https://chromewebstore.google.com/detail/nkjjgbkfdaembjfandhlgfijhbigblnn
