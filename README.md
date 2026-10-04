@@ -91,6 +91,7 @@ the reviewed build, kept up to date by Firefox. Requires Firefox 140 or newer.
 ## Usage
 
 - Click a post link to peek. Ctrl/Cmd-, Shift-, Alt- or middle-click opens the link normally.
+- The toolbar icon opens the settings: peeking on or off, on or off for X and Bluesky separately, the dot marker, and the popup theme.
 - Esc or clicking the backdrop closes the popup. Quoted posts and "Replying to" open in the same popup.
 - Toolbar button: toggle peeking, the dot marker, and the popup theme.
 

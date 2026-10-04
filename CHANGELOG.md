@@ -3,6 +3,14 @@
 All notable changes to Post Peek. Versions follow [semantic versioning](https://semver.org/),
 and each released version is a git tag and an upload to the Chrome Web Store and addons.mozilla.org.
 
+## [1.4.0] - 2026-10-04
+
+### Added
+
+- A switch for each site in the settings. With "X posts" or "Bluesky posts" off, that
+  site's links get no dot and open as any other link does. Both are on by default, and
+  "Enable post peeking" still turns everything off at once.
+
 ## [1.3.0] - 2026-10-04
 
 Bluesky support, and a privacy fix for images and video that affects every earlier version.
@@ -261,7 +269,8 @@ Repository and test changes only. The packaged extension - `manifest.json`, `src
   a release workflow that checks the tag against the manifest version and attaches the
   zip to a GitHub release, and Chrome Web Store listing copy, screenshots, and promo tiles.
 
-[Unreleased]: https://github.com/tsvb/post-peek/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/tsvb/post-peek/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/tsvb/post-peek/releases/tag/v1.4.0
 [1.3.0]: https://github.com/tsvb/post-peek/releases/tag/v1.3.0
 [1.2.0]: https://github.com/tsvb/post-peek/releases/tag/v1.2.0
 [1.1.4]: https://github.com/tsvb/post-peek/releases/tag/v1.1.4

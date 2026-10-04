@@ -13,13 +13,14 @@
    with a malformed id is dotted and then opens normally.
 
    Dots are opt-in at the stylesheet level: they appear only once content.js
-   has read the setting and marked <html data-postpeek-dots>. That way a user
+   has read the settings and marked <html data-postpeek-dots="x bsky">, naming
+   the sites that are switched on; each rule looks for its own. That way a user
    who has turned dots off never sees them flash before the setting loads, and
    nothing at all is written to the page. When dots are on, the attribute adds
    no information a page could not already get from the dot's computed style.
    This stylesheet is injected either way, so a page that sets the attribute
    itself can still see the rule take effect. */
-html[data-postpeek-dots]
+html[data-postpeek-dots~="x"]
   a:is(
     [href^="https://x.com/" i], [href^="https://www.x.com/" i], [href^="https://mobile.x.com/" i], [href^="https://m.x.com/" i],
     [href^="https://twitter.com/" i], [href^="https://www.twitter.com/" i], [href^="https://mobile.twitter.com/" i], [href^="https://m.twitter.com/" i],
@@ -40,7 +41,7 @@ html[data-postpeek-dots]
     [href^="//fixupx.com/" i], [href^="//www.fixupx.com/" i], [href^="//mobile.fixupx.com/" i], [href^="//m.fixupx.com/" i],
     [href^="//fixvx.com/" i], [href^="//www.fixvx.com/" i], [href^="//mobile.fixvx.com/" i], [href^="//m.fixvx.com/" i]
   ):is([href*="/status/"], [href*="/statuses/"])::after,
-html[data-postpeek-dots]
+html[data-postpeek-dots~="bsky"]
   a:is([href^="https://bsky.app/profile/" i], [href^="http://bsky.app/profile/" i])[href*="/post/"]::after {
   content: "";
   display: inline-block;

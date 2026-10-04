@@ -68,11 +68,11 @@ Bluesky's choices are respected: posts whose authors hide them from logged-out v
 
 The extension never scans the pages you visit or touches their links. The dot marker is pure CSS, only the link you click is inspected, and only clicks you make yourself count. It exposes no web-accessible resources, and with the dot marker turned off it writes nothing to the page. A site that goes looking can still tell the extension is installed, because the dot stylesheet is present on every page.
 
-The extension collects nothing. No analytics, no telemetry, no accounts, no servers of ours. Your only stored data is three settings (on/off, dot marker, theme) kept on your device in the browser's local extension storage, never synced.
+The extension collects nothing. No analytics, no telemetry, no accounts, no servers of ours. Your only stored data is five settings (on/off, on/off for each of X and Bluesky, dot marker, theme) kept on your device in the browser's local extension storage, never synced.
 
 <b>How to use</b>
 
-Click any dotted link. Hold Ctrl, Cmd, Shift, or Alt while clicking, or middle-click, to open the link normally in a new tab instead. Click the toolbar icon to turn peeking off, hide the dots, or change the theme.
+Click any dotted link. Hold Ctrl, Cmd, Shift, or Alt while clicking, or middle-click, to open the link normally in a new tab instead. Click the toolbar icon to turn peeking off, turn it off for X or Bluesky alone, hide the dots, or change the theme.
 
 <b>Limits</b>
 
@@ -122,15 +122,9 @@ Testing: serve the repository folder over HTTP (`python -m http.server 8000`) an
 
 ## Version notes
 
-Paste into "Release notes" when uploading the version. For 1.3.0:
+Paste into "Release notes" when uploading the version. For 1.4.0:
 
-Bluesky support: bsky.app post links are dotted and open in the popup, with text, images, link cards, quoted posts and reply context. Bluesky's moderation choices are honored, and labeled media stays behind a click. Bluesky video shows its thumbnail with a link to watch on Bluesky, because Firefox has no built-in HLS playback.
-
-Privacy fix: images and video no longer tell X or Bluesky which site you are reading. Images are now fetched by the extension itself, and video plays in a sandboxed frame, so no request carries the page's Origin or Referer. This affected X images and video in earlier versions.
-
-Permissions: four hosts were added for Bluesky (public.api.bsky.app, cdn.bsky.app, video.bsky.app and video.cdn.bsky.app), and video.twimg.com was dropped because it was never needed. If you limited the add-on to specific sites, allow the four new hosts as well.
-
-Also fixed: stray characters at the end of some X posts with emoji, HTML entities shown literally in X posts, Esc not closing the popup after a click on a video, and links staying intercepted in open tabs after the add-on was updated or removed.
+A switch for each site. The settings now have "X posts" and "Bluesky posts" under "Enable post peeking". With one off, that site's links get no dot and open as any other link does. Both are on by default, and nothing else changes.
 
 ## Assets
 

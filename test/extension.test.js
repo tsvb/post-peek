@@ -192,7 +192,10 @@ test('popup styling falls back to a <style> when adoptedStyleSheets throws', () 
 // Dots must be opt-in: the rule may only apply once content.js has read the
 // setting, or a user with dots off sees them flash on every page load.
 test('dot rule is gated on the opt-in attribute', () => {
-  assert.match(contentCss, /html\[data-postpeek-dots\]/);
+  // One rule per site, each under its own word in the attribute, and no rule
+  // that applies without it.
+  const gates = contentCss.match(/^html\[[^\]]*\]/gm);
+  assert.deepStrictEqual(gates, ['html[data-postpeek-dots~="x"]', 'html[data-postpeek-dots~="bsky"]']);
   assert.ok(
     !/:not\(\[data-postpeek-nodots\]\)/.test(contentCss),
     'the dots-off polarity reintroduces the load flash',
@@ -459,7 +462,7 @@ test('gated media is not built before the click', () => {
 
 // ------------------------------------------------------------ click handler
 
-function clickHarness({ orphaned = false, enabled = true } = {}) {
+function clickHarness({ orphaned = false, enabled = true, peekX = true, peekBsky = true } = {}) {
   class Anchor { constructor(href) { this.href = href; } }
   const calls = { shown: [], removed: 0, closed: 0 };
   const document = {
@@ -469,7 +472,7 @@ function clickHarness({ orphaned = false, enabled = true } = {}) {
   const onClick = new Function(
     'settings', 'parseLink', 'showPost', 'orphaned', 'closePopup', 'document', 'HTMLAnchorElement',
     `${extractFn(contentJs, 'onClick')}; return onClick;`,
-  )({ enabled }, parseLink, (ref) => calls.shown.push(ref), () => orphaned, () => { calls.closed++; }, document, Anchor);
+  )({ enabled, peekX, peekBsky }, parseLink, (ref) => calls.shown.push(ref), () => orphaned, () => { calls.closed++; }, document, Anchor);
   const click = (over = {}) => {
     const e = {
       isTrusted: true, button: 0, prevented: false, stopped: false,
@@ -490,6 +493,51 @@ test('a real click on a post link opens the popup', () => {
   assert.ok(e.prevented && e.stopped);
   assert.deepStrictEqual(calls.shown, [{ site: 'x', id: '20' }]);
   assert.ok(!click({ ctrlKey: true }).prevented, 'a modified click must open the link normally');
+});
+
+// Each site has its own switch. A link to a site that is off must open as any
+// other link does, and must not be dotted.
+test('a site switched off is neither peeked nor dotted', () => {
+  const bskyLink = { composedPath: () => [{ href: 'https://bsky.app/profile/bsky.app/post/3l6oveex3ii2l' }] };
+  const peeks = (opts, over) => {
+    const h = clickHarness(opts);
+    // The harness's anchor class is private to it, so borrow one of its own.
+    const anchor = Object.getPrototypeOf(h.click({ ctrlKey: true }).composedPath()[0]).constructor;
+    const path = over ? [new anchor(over.composedPath()[0].href)] : undefined;
+    return h.click(path ? { composedPath: () => path } : {}).prevented;
+  };
+  assert.ok(peeks({}) && peeks({}, bskyLink));
+  assert.ok(!peeks({ peekX: false }), 'an X link was peeked with X off');
+  assert.ok(peeks({ peekX: false }, bskyLink), 'turning X off turned Bluesky off');
+  assert.ok(!peeks({ peekBsky: false }, bskyLink), 'a Bluesky link was peeked with Bluesky off');
+  assert.ok(peeks({ peekBsky: false }), 'turning Bluesky off turned X off');
+
+  const dots = (settings) => {
+    const document = { documentElement: { dataset: {} } };
+    new Function('settings', 'document', 'applyTheme', `${extractFn(contentJs, 'applySettings')}; applySettings();`)(
+      { enabled: true, showDots: true, peekX: true, peekBsky: true, ...settings }, document, () => {},
+    );
+    return document.documentElement.dataset.postpeekDots;
+  };
+  assert.strictEqual(dots({}), 'x bsky');
+  assert.strictEqual(dots({ peekX: false }), 'bsky');
+  assert.strictEqual(dots({ peekBsky: false }), 'x');
+  // Nothing is written to the page when there is nothing to dot.
+  for (const off of [{ peekX: false, peekBsky: false }, { showDots: false }, { enabled: false }]) {
+    assert.strictEqual(dots(off), undefined);
+  }
+
+  // The options page offers both switches and stores them under these names.
+  const html = read('options/options.html');
+  const js = read('options/options.js');
+  for (const id of ['peekX', 'peekBsky']) {
+    assert.ok(html.includes(`id="${id}"`), `no ${id} switch in the options page`);
+    assert.match(js, new RegExp(`${id}: true`), `${id} does not default to on`);
+    assert.ok(contentJs.includes(`${id}: true`), `${id} does not default to on in the content script`);
+  }
+  // The indent of the two rows has to come after the row's own padding, or
+  // the shorthand there resets it.
+  assert.ok(html.indexOf('label.sub {') > html.indexOf('label.row {'), 'label.row padding overrides the label.sub indent');
 });
 
 // A page can dispatch a click itself. If the handler answered, any site could
