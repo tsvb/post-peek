@@ -27,8 +27,8 @@ body{font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Ar
 </style></head><body><div class="glow"></div>
 <div class="row"><div class="icon"></div><div class="text">
 <div class="name">Post Peek</div>
-<div class="tag">Read one X post and leave.</div>
-<div class="sub">Post links open in a popup<br>No account · No cookies sent to X</div>
+<div class="tag">Read one post and leave.</div>
+<div class="sub">X and Bluesky links open in a popup<br>No account · No cookies sent</div>
 </div></div></body></html>`;
 }
 

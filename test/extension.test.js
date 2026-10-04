@@ -327,6 +327,82 @@ test('videos play only inside the sandboxed no-referrer frame', () => {
   assert.strictEqual((contentJs.match(/\.srcdoc\s*=/g) || []).length, 1, 'srcdoc is set outside player()');
 });
 
+// Keys pressed inside a player's frame never reach the page, so Esc would not
+// close the popup after a click on the video. Focus a click put in the frame
+// goes back to the card; focus that Tab put there stays.
+function focusHarness({ active = 'iframe', open = true } = {}) {
+  const calls = { focused: 0, closed: 0 };
+  const timers = [];
+  const state = {
+    overlay: open ? { firstElementChild: { focus: () => { calls.focused++; } } } : null,
+    shadow: { activeElement: active && { localName: active } },
+  };
+  const api = new Function('state', 'closePopup', 'setTimeout', `
+    let lastTab = -Infinity;
+    with (state) {
+      ${extractFn(contentJs, 'onKey')}
+      ${extractFn(contentJs, 'onFrameFocus')}
+      return { onKey, onFrameFocus };
+    }
+  `)(state, () => { calls.closed++; }, (fn) => timers.push(fn));
+  const blur = (timeStamp) => { api.onFrameFocus({ timeStamp }); timers.splice(0).forEach((fn) => fn()); };
+  const key = (k, timeStamp) => api.onKey({ key: k, timeStamp, preventDefault() {}, stopPropagation() {} });
+  return { blur, key, calls, state, timers, onFrameFocus: api.onFrameFocus };
+}
+
+test('focus a click put inside a video frame returns to the popup', () => {
+  const h = focusHarness();
+  h.blur(5000);
+  assert.strictEqual(h.calls.focused, 1, 'the card must take focus back from the frame');
+
+  // Only after the blur has run its course, or the browser hands focus to the
+  // frame anyway.
+  h.onFrameFocus({ timeStamp: 6000 });
+  assert.strictEqual(h.calls.focused, 1, 'focus was moved from inside the blur event');
+  h.state.overlay = null; // closed in between
+  h.timers.splice(0).forEach((fn) => fn());
+  assert.strictEqual(h.calls.focused, 1);
+
+  // The window also loses focus when the user switches to another window or
+  // tab. Focus is in no frame then, and nothing must move.
+  const away = focusHarness({ active: 'button' });
+  away.blur(5000);
+  assert.strictEqual(away.calls.focused, 0, 'focus moved though no frame had it');
+  const none = focusHarness({ active: null });
+  none.blur(5000);
+  assert.strictEqual(none.calls.focused, 0);
+  const closed = focusHarness({ open: false });
+  closed.blur(5000);
+  assert.strictEqual(closed.calls.focused, 0);
+});
+
+test('focus that Tab moved into a video frame stays there', () => {
+  const h = focusHarness();
+  h.key('Tab', 5000);
+  h.blur(5001);
+  assert.strictEqual(h.calls.focused, 0, 'the video controls must stay reachable by keyboard');
+  // A later click on the player is not excused by that old Tab.
+  h.blur(9000);
+  assert.strictEqual(h.calls.focused, 1);
+  // Other keys do not count as Tab, and Esc still closes.
+  const other = focusHarness();
+  other.key('a', 5000);
+  other.blur(5001);
+  assert.strictEqual(other.calls.focused, 1);
+  other.key('Escape', 6000);
+  assert.strictEqual(other.calls.closed, 1);
+});
+
+test('the frame-focus listener lives only while the popup is open', () => {
+  assert.ok(sliceFn(contentJs, 'showPost').includes("window.addEventListener('blur', onFrameFocus)"));
+  assert.ok(extractFn(contentJs, 'closePopup').includes("window.removeEventListener('blur', onFrameFocus)"));
+  assert.strictEqual((contentJs.match(/addEventListener\('blur'/g) || []).length, 1);
+  // Nothing may be learned from the frame by messaging: a message event is
+  // one the page can see, and forge.
+  const code = contentJs.replace(/^\s*\/\/.*$/gm, '');
+  assert.ok(!/postMessage|addEventListener\('message'|onmessage/.test(code), 'the popup talks to its frames');
+});
+
 // ----------------------------------------------------------------- images
 
 // An <img> pointed at a media host from the page sends cookies, or with
@@ -453,6 +529,23 @@ test('X post text is unescaped after it is cut', () => {
   // Entity indices count the escaped text, so slices are cut first.
   const renderText = extractFn(contentJs, 'renderText');
   assert.strictEqual((renderText.match(/out\.append\(unescapeX\(chars\.slice\(/g) || []).length, 2);
+});
+
+// Seen on a real post: display_text_range is in UTF-16 units, entity indices
+// in code points, so the hidden media link straddled the end of the range and
+// its first characters (" h" of " https://t.co/...") leaked into the text.
+test('X text ends at a media link that straddles the display range', () => {
+  const node = () => ({ parts: [], append(x) { this.parts.push(x); }, get lastChild() { return null; } });
+  const renderText = new Function('el', 'extLink', 'unescapeX', `${sliceFn(contentJs, 'renderText')}; return renderText;`)(
+    node, (href, label) => ({ label }), (s) => s,
+  );
+  const text = 'Hey 👑 you https://t.co/abcdefghij';
+  const start = Array.from(text).indexOf('h', 5); // code points
+  const out = renderText({ text, display_text_range: [0, start + 2], entities: { media: [{ indices: [start, Array.from(text).length] }] } });
+  assert.deepStrictEqual(out.parts, ['Hey 👑 you ']);
+  // An entity wholly past the range is still just left out.
+  const plain = renderText({ text: 'ab https://t.co/x', display_text_range: [0, 2], entities: { media: [{ indices: [3, 17] }] } });
+  assert.deepStrictEqual(plain.parts, ['ab']);
 });
 
 test('Bluesky link text naming another site is detected', () => {
@@ -599,6 +692,15 @@ test('the media proxy returns only images, from the allowlist, uncached', async 
   await assert.rejects(redirected.fetchMedia('https://pbs.twimg.com/media/a.jpg'), /BAD_HOST/);
   const video = loadBackground(async (url) => image(url, 'video/mp4'));
   await assert.rejects(video.fetchMedia('https://video.twimg.com/a.mp4'), /NOT_AN_IMAGE/);
+
+  // video.cdn.bsky.app serves JPEG thumbnails as application/octet-stream, so
+  // a mislabeled image is recognized by its first bytes, and only by those.
+  const mislabeled = loadBackground(async (url) => ({
+    ...image(url, 'application/octet-stream'), arrayBuffer: async () => new Uint8Array([0xff, 0xd8, 0xff, 0xe0]).buffer,
+  }));
+  assert.match(await mislabeled.fetchMedia('https://video.cdn.bsky.app/t.jpg'), /^data:image\/jpeg;base64,/);
+  const junk = loadBackground(async (url) => image(url, 'application/octet-stream'));
+  await assert.rejects(junk.fetchMedia('https://video.cdn.bsky.app/t.jpg'), /NOT_AN_IMAGE/);
 });
 
 test('settings live in local storage, sync only for the one-time migration', () => {

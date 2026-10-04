@@ -88,12 +88,33 @@
     overlay.remove();
     overlay = null;
     document.removeEventListener('keydown', onKey, true);
+    window.removeEventListener('blur', onFrameFocus);
     if (lastFocus && lastFocus.focus) lastFocus.focus();
     lastFocus = null;
   }
 
+  let lastTab = -Infinity;
+
   function onKey(e) {
     if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closePopup(); }
+    else if (e.key === 'Tab') lastTab = e.timeStamp;
+  }
+
+  // A key pressed while focus is inside a player's frame never reaches this
+  // document, so Esc could not close the popup after a click on the video's
+  // controls. The window's blur event is the one sign of focus going into the
+  // frame, and when a click put it there, the card takes it straight back.
+  // The click itself has already landed on the control. Focus that arrived by
+  // Tab (the blur comes in the same instant as the key) is left alone, so the
+  // controls stay reachable from the keyboard; Tab leads back out again.
+  function onFrameFocus(e) {
+    if (!overlay || e.timeStamp - lastTab < 100) return;
+    // Not from inside the blur itself: the browser is still handing focus to
+    // the frame, and would finish doing so after the card took it.
+    setTimeout(() => {
+      const card = overlay?.firstElementChild;
+      if (card && shadow.activeElement?.localName === 'iframe') card.focus({ preventScroll: true });
+    });
   }
 
   function el(tag, attrs = {}, children = []) {
@@ -199,15 +220,19 @@
     ents.sort((a, b) => a.i[0] - b.i[0]);
 
     const out = el('div', { class: cls });
-    let pos = range[0];
+    let pos = range[0], stop = range[1];
     for (const e of ents) {
       const [s, end] = e.i;
-      if (s < pos || end > range[1]) continue;
+      if (s < pos || s >= stop) continue;
       if (s > pos) out.append(unescapeX(chars.slice(pos, s).join('')));
       if (!e.hide) out.append(extLink(e.href, e.label));
+      // The API counts display_text_range in UTF-16 units but entity indices
+      // in code points, so after an emoji the trailing media link can straddle
+      // the end of the range. The text then ends where that entity starts.
+      if (end > stop) { pos = stop = s; break; }
       pos = end;
     }
-    if (pos < range[1]) out.append(unescapeX(chars.slice(pos, range[1]).join('')));
+    if (pos < stop) out.append(unescapeX(chars.slice(pos, stop).join('')));
     // Trim leftover whitespace from removed media links.
     if (out.lastChild?.nodeType === 3) out.lastChild.textContent = out.lastChild.textContent.replace(/\s+$/, '');
     return out;
@@ -603,6 +628,7 @@
       overlay.addEventListener('click', (e) => { if (e.target === overlay) closePopup(); });
       shadow.append(overlay);
       document.addEventListener('keydown', onKey, true);
+      window.addEventListener('blur', onFrameFocus);
     }
     const card = el('div', { class: 'lb-card', tabindex: '-1' });
     const close = el('button', { class: 'lb-close', type: 'button', 'aria-label': 'Close', text: '×' });

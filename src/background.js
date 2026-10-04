@@ -154,15 +154,29 @@ const MEDIA_HOSTS = new Set([
   'cdn.bsky.app', 'video.bsky.app', 'video.cdn.bsky.app',
 ]);
 
+// The image type a file's first bytes say it is, or null. video.cdn.bsky.app
+// serves its JPEG thumbnails as application/octet-stream, so the header alone
+// cannot be trusted to say "image".
+function sniffImage(buf) {
+  const b = new Uint8Array(buf, 0, Math.min(buf.byteLength, 12));
+  const at = (i, ...bytes) => bytes.every((v, k) => b[i + k] === v);
+  if (at(0, 0xff, 0xd8, 0xff)) return 'image/jpeg';
+  if (at(0, 0x89, 0x50, 0x4e, 0x47)) return 'image/png';
+  if (at(0, 0x47, 0x49, 0x46, 0x38)) return 'image/gif';
+  if (at(0, 0x52, 0x49, 0x46, 0x46) && at(8, 0x57, 0x45, 0x42, 0x50)) return 'image/webp';
+  return null;
+}
+
 async function fetchMedia(url) {
   const u = new URL(url);
   if (u.protocol !== 'https:' || !MEDIA_HOSTS.has(u.hostname)) throw new Error('BAD_HOST');
   const res = await fetch(u.href, { credentials: 'omit', referrerPolicy: 'no-referrer', cache: 'no-store' });
   if (!res.ok) throw new Error(`HTTP_${res.status}`);
   if (!MEDIA_HOSTS.has(new URL(res.url).hostname)) throw new Error('BAD_HOST');
-  const type = res.headers.get('content-type') || '';
-  if (!type.startsWith('image/')) throw new Error('NOT_AN_IMAGE');
+  const declared = res.headers.get('content-type') || '';
   const buf = await res.arrayBuffer();
+  const type = declared.startsWith('image/') ? declared : sniffImage(buf);
+  if (!type) throw new Error('NOT_AN_IMAGE');
   return `data:${type};base64,${toBase64(buf)}`;
 }
 

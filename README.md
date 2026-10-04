@@ -1,6 +1,6 @@
 <p align="center">
   <img src="media/banner.png" width="820"
-       alt="Post Peek - read one X post and leave. A Chrome and Firefox extension that opens post links in a popup, not the full site.">
+       alt="Post Peek - read one post and leave. A Chrome and Firefox extension that opens X and Bluesky post links in a popup, not the full site.">
 </p>
 
 <p align="center">
@@ -30,8 +30,8 @@
 
 <table>
   <tr>
-    <td width="50%"><img src="media/shot-links.png" alt="An article with two x.com links, each followed by a small blue dot."></td>
-    <td width="50%"><img src="media/shot-popup.png" alt="The same article with the post open in a popup over the page, showing text, a photo, the date, and an Open on X button."></td>
+    <td width="50%"><img src="media/shot-links.png" alt="An article with two post links (to x.com in this example), each followed by a small blue dot."></td>
+    <td width="50%"><img src="media/shot-popup.png" alt="The same article with the post open in a popup over the page, showing text, a photo, the date, and a button to open it on its own site (X in this example)."></td>
   </tr>
   <tr>
     <td align="center"><sub><b>A blue dot marks a link Post Peek can open.</b></sub></td>

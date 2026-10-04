@@ -62,8 +62,8 @@ body{font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Ar
 </style></head><body><div class="glow"></div>
 <div class="left"><div class="icon"></div><div>
 <div class="name">Post Peek</div>
-<div class="tag">Read one X post and leave.</div>
-<div class="sub">Chrome extension &middot; post links open in a popup, not the full site</div>
+<div class="tag">Read one post and leave.</div>
+<div class="sub">Chrome and Firefox extension &middot; X and Bluesky post links open in a popup, not the full site</div>
 </div></div>
 <div class="card">
   <div class="head"><div class="av"></div><div class="bars"><div class="bar"></div><div class="bar"></div></div></div>

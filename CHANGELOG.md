@@ -64,17 +64,26 @@ and each released version is a git tag and an upload to the Chrome Web Store and
   open normally.
 - On a page that replaced its `<body>`, clicks on post links were swallowed and no popup
   appeared.
+- Bluesky video thumbnails were refused by the image proxy: `video.cdn.bsky.app` serves
+  them as `application/octet-stream`. A mislabeled image is now recognized by its first bytes.
+- X posts with an emoji and attached media showed a stray " h" at the end of the text.
 - X post text showed `&amp;`, `&lt;` and `&gt;` literally.
 - Expired posts stayed in the service worker's memory until the same post was requested
   again. They are now dropped after five minutes.
+- Esc closes the popup after a click on a video's controls. The click moved keyboard focus
+  into the player's sandboxed frame, where the popup could not see the key; the popup now
+  takes focus back as soon as a click puts it there.
 
 ### Known limitations
 
-- While keyboard focus is inside a video player, Esc does not close the popup: the
-  sandboxed frame keeps its key presses to itself. Click outside the video first, or use
-  the close button.
+- After you Tab into a video player's controls, Esc does not close the popup: the
+  sandboxed frame keeps its key presses to itself. Tab back out first, or use the close
+  button. (After a click on the player, Esc works; see Fixed.) For the same reason, the
+  player's own keyboard shortcuts, such as Space to pause, work only after you Tab into it.
 - A video the page's Content Security Policy blocks shows an empty player rather than a
-  "could not be loaded" message, because the frame cannot report the failure.
+  "could not be loaded" message. The frame cannot report the failure without a script
+  and a message the page could see and forge, and the page's policy cannot be read
+  without making a request. "Open on X" or "Open on Bluesky" below the post still works.
 
 ### Repository
 
