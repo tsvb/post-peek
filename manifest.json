@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Post Peek",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Read one post and leave. Opens X and Bluesky post links in a popup, not the full site. No account, no cookies sent to either.",
   "homepage_url": "https://timvanbenschoten.com/code/post-peek",
   "icons": {

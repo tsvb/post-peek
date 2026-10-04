@@ -1,6 +1,6 @@
 {
   "name": "post-peek",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "private": true,
   "description": "Read one post and leave. Chrome and Firefox extension that opens X and Bluesky post links in a popup.",
   "license": "MIT",

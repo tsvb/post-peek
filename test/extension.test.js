@@ -535,6 +535,9 @@ test('a site switched off is neither peeked nor dotted', () => {
     assert.match(js, new RegExp(`${id}: true`), `${id} does not default to on`);
     assert.ok(contentJs.includes(`${id}: true`), `${id} does not default to on in the content script`);
   }
+  // The indent of the two rows has to come after the row's own padding, or
+  // the shorthand there resets it.
+  assert.ok(html.indexOf('label.sub {') > html.indexOf('label.row {'), 'label.row padding overrides the label.sub indent');
 });
 
 // A page can dispatch a click itself. If the handler answered, any site could
