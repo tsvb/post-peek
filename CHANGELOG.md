@@ -3,6 +3,14 @@
 All notable changes to Post Peek. Versions follow [semantic versioning](https://semver.org/),
 and each released version is a git tag and an upload to the Chrome Web Store and addons.mozilla.org.
 
+## [Unreleased]
+
+### Added
+
+- A switch for each site in the settings. With "X posts" or "Bluesky posts" off, that
+  site's links get no dot and open as any other link does. Both are on by default, and
+  "Enable post peeking" still turns everything off at once.
+
 ## [1.3.0] - 2026-10-04
 
 Bluesky support, and a privacy fix for images and video that affects every earlier version.

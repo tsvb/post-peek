@@ -41,11 +41,11 @@ Bluesky's choices are respected: posts whose authors hide them from logged-out v
 
 The extension never scans the pages you visit or touches their links. The dot marker is pure CSS, only the link you click is inspected, and only clicks you make yourself count. It exposes no web-accessible resources, and with the dot marker turned off it writes nothing to the page. A site that goes looking can still tell the extension is installed, because the dot stylesheet is present on every page.
 
-The extension collects nothing. No analytics, no telemetry, no accounts, no servers of ours. Your only stored data is three settings (on/off, dot marker, theme) kept on your device in Chrome's local extension storage, never synced.
+The extension collects nothing. No analytics, no telemetry, no accounts, no servers of ours. Your only stored data is five settings (on/off, on/off for each of X and Bluesky, dot marker, theme) kept on your device in Chrome's local extension storage, never synced.
 
 HOW TO USE
 
-Click any dotted link. Hold Ctrl, Cmd, Shift, or Alt while clicking, or middle-click, to open the link normally in a new tab instead. Click the toolbar icon to turn peeking off, hide the dots, or change the theme.
+Click any dotted link. Hold Ctrl, Cmd, Shift, or Alt while clicking, or middle-click, to open the link normally in a new tab instead. Click the toolbar icon to turn peeking off, turn it off for X or Bluesky alone, hide the dots, or change the theme.
 
 LIMITS
 
@@ -69,7 +69,7 @@ Opens links to x.com, twitter.com, and bsky.app posts in an on-page popup so use
 
 ### storage justification
 
-Stores the user's three preferences: whether peeking is enabled, whether openable links are marked with a dot, and the popup theme. Nothing else is stored.
+Stores the user's five preferences: whether peeking is enabled, whether it is enabled for X and for Bluesky, whether openable links are marked with a dot, and the popup theme. Nothing else is stored.
 
 ### Host permission justification
 

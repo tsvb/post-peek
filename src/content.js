@@ -31,7 +31,7 @@
     /^https?:\/\/bsky\.app\/profile\/([A-Za-z0-9._:%-]{1,253})\/post\/([A-Za-z0-9._~:-]{1,512})(?:[/?#]|$)/;
   const BSKY_ACTOR_RE = /^(?:did:[a-z]+:[A-Za-z0-9._:%-]+|[A-Za-z0-9.-]+)$/;
 
-  const settings = { showDots: true, theme: 'auto', enabled: true };
+  const settings = { showDots: true, theme: 'auto', enabled: true, peekX: true, peekBsky: true };
 
   // Returns { site: 'x', id } or { site: 'bsky', actor, rkey }, or null.
   function parseLink(href) {
@@ -680,6 +680,8 @@
     if (!a) return;
     const ref = parseLink(a.href);
     if (!ref) return;
+    // A site switched off in the settings opens as any other link does.
+    if (!(ref.site === 'bsky' ? settings.peekBsky : settings.peekX)) return;
     e.preventDefault();
     e.stopImmediatePropagation();
     showPost(ref);
@@ -688,10 +690,13 @@
 
   // ---------- settings ----------
   function applySettings() {
-    // content.css draws a dot only under html[data-postpeek-dots], so dots stay
+    // content.css draws a dot only under html[data-postpeek-dots~=...], so dots stay
     // invisible until the setting has actually been read. A user with dots off
     // never sees them flash, and nothing is written to the page at all.
-    if (settings.showDots && settings.enabled) document.documentElement.dataset.postpeekDots = '';
+    // The attribute lists the sites that are on ("x bsky"), and each dot rule
+    // looks for its own, so a link that would not be peeked gets no dot.
+    const sites = [settings.peekX && 'x', settings.peekBsky && 'bsky'].filter(Boolean);
+    if (settings.showDots && settings.enabled && sites.length) document.documentElement.dataset.postpeekDots = sites.join(' ');
     else delete document.documentElement.dataset.postpeekDots;
     applyTheme();
   }

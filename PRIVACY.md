@@ -31,7 +31,7 @@ A website can still tell that Post Peek is installed if it looks for it: the sty
 
 ## Where your settings live
 
-Your three preferences (whether peeking is enabled, whether links are marked with a dot, and the popup theme) are stored in the browser's local extension storage on your device. They are not synced to a Google or Firefox account or sent anywhere. Uninstalling the extension deletes them.
+Your five preferences (whether peeking is enabled, whether it is on for X and for Bluesky, whether links are marked with a dot, and the popup theme) are stored in the browser's local extension storage on your device. They are not synced to a Google or Firefox account or sent anywhere. Uninstalling the extension deletes them.
 
 ## Permissions explained
 
