@@ -1,7 +1,7 @@
 # Changelog
 
 All notable changes to Post Peek. Versions follow [semantic versioning](https://semver.org/),
-and each released version is a git tag and a Chrome Web Store upload.
+and each released version is a git tag and an upload to the Chrome Web Store and addons.mozilla.org.
 
 ## [Unreleased]
 
@@ -24,6 +24,12 @@ and each released version is a git tag and a Chrome Web Store upload.
 - Bluesky link text that names one site while the link opens another is followed by the
   site it really opens.
 
+- Links to the addons.mozilla.org listing in README.md and `store/LISTING-FIREFOX.md`.
+- `homepage_url` in the manifest: the project page,
+  [timvanbenschoten.com/code/post-peek](https://timvanbenschoten.com/code/post-peek), which
+  Chrome and Firefox link from the extension's details. The store listing notes use it as the
+  homepage too, and GitHub releases made by the release workflow start with a "Project page" line.
+
 ### Changed
 
 - Every image (avatars, photos, card thumbnails, video posters) is now fetched by the
@@ -36,6 +42,10 @@ and each released version is a git tag and a Chrome Web Store upload.
 - PRIVACY.md, the README and the store listing now say what is true of video caching, GIFs
   loading when a post opens, and a site's ability to detect the extension through its dot
   stylesheet. `store/LISTING.md` covers Bluesky and all seven host permissions.
+
+- The addons.mozilla.org listing passed Mozilla's review and is public. README.md now points
+  Firefox users straight to it instead of the release zip, and `store/LISTING-FIREFOX.md`
+  records the approval.
 
 ### Fixed
 
@@ -73,6 +83,51 @@ and each released version is a git tag and a Chrome Web Store upload.
 - Tests now run the real service worker functions against a stubbed `fetch` (withholding,
   cache eviction, the media proxy), exercise the click handler, and pin down that no image
   or video is ever loaded from the page directly.
+
+## [1.2.0] - 2026-09-13
+
+First release for Firefox. Requested in [#3](https://github.com/tsvb/post-peek/issues/3).
+
+### Added
+
+- Firefox support. `npm run build` now also writes `dist/post-peek-<version>-firefox.zip`,
+  the same files with the manifest rewritten by `scripts/firefox-manifest.js`: Firefox has
+  no background service workers, so `src/background.js` runs as an event page instead, and
+  the manifest carries the add-on ID (`post-peek@timvbs.com`), a minimum of Firefox 140,
+  and the `data_collection_permissions: none` declaration addons.mozilla.org requires. The
+  checked-in `manifest.json` is unchanged, so the Chrome zip is byte-for-byte what it was.
+- The popup stylesheet falls back to a `<style>` inside the closed shadow root when
+  `adoptedStyleSheets` cannot be assigned. Firefox before 153 rejects that assignment from
+  a content script (Firefox bug 1751346). The fallback is still invisible to the page;
+  the one difference is that on those older Firefox versions a host page with a strict
+  `style-src` policy can block it, leaving the popup unstyled there.
+- The "reload this page" hint also recognises Firefox's wording when the extension has
+  been updated under an open page.
+- Tests for the Firefox manifest rewrite and the stylesheet fallback, and the release
+  workflow runs `web-ext lint` (the addons.mozilla.org validator) on the Firefox zip and
+  attaches both zips to the GitHub release.
+- `store/LISTING-FIREFOX.md`, the addons.mozilla.org listing copy and submission notes,
+  alongside the Chrome one.
+- Install links to the published Chrome Web Store listing: an Add to Chrome button under
+  the tagline, a store-version badge in place of the GitHub release badge, and an `Install`
+  section that leads with the store and keeps loading unpacked as a subsection for
+  development. The listing URL is also recorded in `store/LISTING.md`.
+- README artwork in `media/`, rendered by `scripts/make-readme-media.js` (`npm run media`):
+  a banner reusing the mark and gradient from the store tiles, and the two store
+  screenshots cropped to their content. The store PNGs stay 1280x800 for the dashboard.
+- The README leads with the banner, status badges, and the two store screenshots as a
+  before/after pair.
+
+### Changed
+
+- Documentation credits [Litterbox](https://andadinosaur.com/launch-litterbox) by name,
+  author, and launch post in README.md, the store listing, and the 1.0.0 changelog entry,
+  naming which of this extension's ideas are Litterbox's - the popup, the marker on
+  openable links, the cookie-free embed fetch, the link out to X, the name, and the
+  tagline - and saying plainly that Post Peek is a from-scratch Chrome implementation of
+  them rather than a port.
+- Two feature lines were reworded away from Litterbox's own App Store copy, which they had
+  been echoing almost verbatim.
 
 ## [1.1.4] - 2026-09-06
 
@@ -159,16 +214,19 @@ Repository and test changes only. The packaged extension - `manifest.json`, `src
 
 ### Added
 
-- First release: a Chrome MV3 port of the Safari extension
-  [Litterbox - Post Peeker](https://apps.apple.com/us/app/litterbox-post-peeker/id6805719216).
+- First release: an independent Chrome MV3 take on
+  [Litterbox](https://andadinosaur.com/launch-litterbox), the Safari extension by Zhenyi Tan
+  (And a Dinosaur), written from scratch rather than ported - Litterbox is closed source.
   Clicking an x.com or twitter.com post link opens the post in a popup rendered in a closed
-  Shadow DOM, using the same syndication API that powers X's embed widgets. Renders text,
+  Shadow DOM, using X's public syndication endpoint, the one behind X's own embedded posts.
+  Renders text,
   photos, video, link cards, quoted posts, and reply context. Openable links get a small
   blue dot. Options page for toggling peeking, dots, and the popup theme.
 - Dependency-free zip builder (`npm run build`) and icon generator (`npm run icons`),
   a release workflow that checks the tag against the manifest version and attaches the
   zip to a GitHub release, and Chrome Web Store listing copy, screenshots, and promo tiles.
 
+[Unreleased]: https://github.com/tsvb/post-peek/compare/v1.1.4...HEAD
 [1.1.4]: https://github.com/tsvb/post-peek/releases/tag/v1.1.4
 [1.1.3]: https://github.com/tsvb/post-peek/releases/tag/v1.1.3
 [1.1.2]: https://github.com/tsvb/post-peek/releases/tag/v1.1.2

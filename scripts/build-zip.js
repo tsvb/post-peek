@@ -1,14 +1,17 @@
-// Builds a Chrome Web Store upload zip in dist/ with no dependencies.
+// Builds the store upload zips in dist/ with no dependencies:
+//   post-peek-<version>.zip          Chrome Web Store (manifest.json as checked in)
+//   post-peek-<version>-firefox.zip  addons.mozilla.org (manifest rewritten by
+//                                    scripts/firefox-manifest.js; everything else identical)
 // Usage: node scripts/build-zip.js
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
+const { toFirefoxManifest } = require('./firefox-manifest');
 
 const root = path.join(__dirname, '..');
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'manifest.json'), 'utf8'));
 const slug = manifest.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const outDir = path.join(root, 'dist');
-const outFile = path.join(outDir, `${slug}-${manifest.version}.zip`);
 
 // Only what the extension needs at runtime.
 const include = ['manifest.json', 'icons', 'src', 'options'];
@@ -42,14 +45,17 @@ function dosDateTime(d) {
 function u16(n) { const b = Buffer.alloc(2); b.writeUInt16LE(n); return b; }
 function u32(n) { const b = Buffer.alloc(4); b.writeUInt32LE(n >>> 0); return b; }
 
+// Each entry is a repo-relative path, or { name, data } to supply the bytes
+// in memory (used to swap in the Firefox manifest without touching the tree).
 function buildZip(files) {
   const parts = [];
   const central = [];
   let offset = 0;
   const { time, date } = dosDateTime(new Date());
-  for (const rel of files) {
+  for (const entry of files) {
+    const rel = typeof entry === 'string' ? entry : entry.name;
     const name = Buffer.from(rel.split(path.sep).join('/'), 'utf8');
-    const data = fs.readFileSync(path.join(root, rel));
+    const data = typeof entry === 'string' ? fs.readFileSync(path.join(root, rel)) : entry.data;
     const comp = zlib.deflateRawSync(data, { level: 9 });
     const crc = crc32(data);
     const local = Buffer.concat([
@@ -75,6 +81,13 @@ function buildZip(files) {
 const files = [];
 for (const entry of include) walk(entry, files);
 fs.mkdirSync(outDir, { recursive: true });
-fs.writeFileSync(outFile, buildZip(files));
-console.log(`${path.relative(root, outFile)} (${files.length} files, ${fs.statSync(outFile).size} bytes)`);
-for (const f of files) console.log('  ' + f);
+
+const firefoxManifest = Buffer.from(JSON.stringify(toFirefoxManifest(manifest), null, 2) + '\n', 'utf8');
+const firefoxFiles = files.map((f) => (f === 'manifest.json' ? { name: f, data: firefoxManifest } : f));
+
+for (const [suffix, list] of [['', files], ['-firefox', firefoxFiles]]) {
+  const outFile = path.join(outDir, `${slug}-${manifest.version}${suffix}.zip`);
+  fs.writeFileSync(outFile, buildZip(list));
+  console.log(`${path.relative(root, outFile)} (${list.length} files, ${fs.statSync(outFile).size} bytes)`);
+  for (const f of list) console.log('  ' + (typeof f === 'string' ? f : `${f.name} (rewritten for Firefox)`));
+}

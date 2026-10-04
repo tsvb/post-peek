@@ -1,12 +1,13 @@
 {
   "name": "post-peek",
-  "version": "1.1.4",
+  "version": "1.2.0",
   "private": true,
-  "description": "Read one post and leave. Chrome extension that opens X and Bluesky post links in a popup.",
+  "description": "Read one post and leave. Chrome and Firefox extension that opens X and Bluesky post links in a popup.",
   "license": "MIT",
   "scripts": {
     "test": "node --test",
     "icons": "node scripts/make-icons.js",
+    "media": "node scripts/make-readme-media.js",
     "build": "node scripts/build-zip.js"
   }
 }

@@ -54,7 +54,10 @@ Posts from protected accounts, age-restricted posts, deleted posts, and Bluesky 
 Post Peek is open source under the MIT license:
 https://github.com/tsvb/post-peek
 
-It is an independent project inspired by the Safari extension Litterbox - Post Peeker by And a Dinosaur. It is not affiliated with that project, with X Corp., or with Bluesky.
+Post Peek is an independent project inspired by Litterbox, the Safari extension for iOS and macOS by Zhenyi Tan (And a Dinosaur). Litterbox is the original, it is free, and if you use Safari you should use it instead:
+https://andadinosaur.com/launch-litterbox
+
+The popup, the marker on links that can be opened, and the cookie-free fetching are all Litterbox's ideas. Post Peek is a separate Chrome implementation of them, written from scratch. It is not affiliated with, endorsed by, or supported by Litterbox, And a Dinosaur, X Corp., or Bluesky.
 
 ## Privacy practices tab
 
@@ -112,5 +115,6 @@ until they are done:
 
 ## Support
 
-- Homepage URL: https://github.com/tsvb/post-peek
+- Homepage URL: https://timvanbenschoten.com/code/post-peek
 - Support URL: https://github.com/tsvb/post-peek/issues
+- Published listing: https://chromewebstore.google.com/detail/nkjjgbkfdaembjfandhlgfijhbigblnn

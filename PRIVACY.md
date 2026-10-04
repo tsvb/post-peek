@@ -31,14 +31,16 @@ A website can still tell that Post Peek is installed if it looks for it: the sty
 
 ## Where your settings live
 
-Your three preferences (whether peeking is enabled, whether links are marked with a dot, and the popup theme) are stored in Chrome's local extension storage on your device. They are not synced to a Google account or sent anywhere. Uninstalling the extension deletes them.
+Your three preferences (whether peeking is enabled, whether links are marked with a dot, and the popup theme) are stored in the browser's local extension storage on your device. They are not synced to a Google or Firefox account or sent anywhere. Uninstalling the extension deletes them.
 
 ## Permissions explained
 
 - **storage**: saves your preferences on this device.
 - **Access to `cdn.syndication.twimg.com`, `pbs.twimg.com`, and `video.twimg.com`**: fetches the X post you clicked and its media.
 - **Access to `public.api.bsky.app`, `cdn.bsky.app`, `video.bsky.app`, and `video.cdn.bsky.app`**: fetches the Bluesky post you clicked and its media.
-- **Access to pages you visit**: needed to intercept clicks on post links, mark them with a dot, and show the popup. See the section above for what the extension does and does not do on those pages. You can restrict this to specific sites from the extension's details page in Chrome.
+- **Access to pages you visit**: needed to intercept clicks on post links, mark them with a dot, and show the popup. See the section above for what the extension does and does not do on those pages. You can restrict this to specific sites from the extension's details page in Chrome, or revoke it per site from the extensions button in Firefox.
+
+The Firefox build declares to addons.mozilla.org that it collects no data (`data_collection_permissions: none`), which is the same claim this policy makes.
 
 ## Changes
 
