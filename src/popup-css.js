@@ -3,8 +3,11 @@
 // website can probe chrome-extension:// URLs to detect the extension.
 // Loaded before content.js as a content script; shares its isolated world.
 var POST_PEEK_CSS = `
+/* The host is a plain div in the page, so the page's own rules for divs reach
+   it. Declarations marked important here win over anything in the page's
+   stylesheets, important or not. */
 :host {
-  all: initial;
+  all: initial !important;
   --lb-bg: #ffffff;
   --lb-fg: #0f1419;
   --lb-muted: #536471;
@@ -12,8 +15,8 @@ var POST_PEEK_CSS = `
   --lb-accent: #1d9bf0;
   --lb-backdrop: rgba(0, 0, 0, 0.55);
   --lb-quote-bg: #f7f9f9;
-  color-scheme: light;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color-scheme: light !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
 }
 :host([data-theme="dark"]) {
   --lb-bg: #15202b;
@@ -22,7 +25,7 @@ var POST_PEEK_CSS = `
   --lb-border: #38444d;
   --lb-backdrop: rgba(0, 0, 0, 0.7);
   --lb-quote-bg: #1e2732;
-  color-scheme: dark;
+  color-scheme: dark !important;
 }
 @media (prefers-color-scheme: dark) {
   :host(:not([data-theme="light"])) {
@@ -32,7 +35,7 @@ var POST_PEEK_CSS = `
     --lb-border: #38444d;
     --lb-backdrop: rgba(0, 0, 0, 0.7);
     --lb-quote-bg: #1e2732;
-    color-scheme: dark;
+    color-scheme: dark !important;
   }
 }
 *, *::before, *::after { box-sizing: border-box; }
@@ -165,14 +168,17 @@ var POST_PEEK_CSS = `
 .lb-foot {
   margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--lb-border);
   display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; color: var(--lb-muted); font-size: 14px; flex-wrap: wrap;
+  gap: 12px; color: var(--lb-muted); font-size: 14px;
 }
+/* Date and counts wrap between items, and the button keeps its place. */
+.lb-meta { display: flex; flex-wrap: wrap; gap: 2px 14px; flex: 1 1 0; min-width: 0; }
 .lb-foot a { color: inherit; text-decoration: none; }
 .lb-foot a:hover { text-decoration: underline; }
-.lb-stats { display: flex; gap: 14px; }
+.lb-stats { display: contents; }
 .lb-open {
   color: #fff !important; background: var(--lb-accent);
   padding: 6px 14px; border-radius: 999px; font-weight: 600;
+  flex: none; white-space: nowrap;
 }
 .lb-open:hover { text-decoration: none !important; filter: brightness(1.08); }
 
@@ -185,5 +191,4 @@ var POST_PEEK_CSS = `
 }
 @keyframes lb-spin { to { transform: rotate(360deg); } }
 
-.lb-frame { width: 100%; border: 0; min-height: 300px; border-radius: 12px; background: #fff; }
 `;

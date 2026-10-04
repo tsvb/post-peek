@@ -3,7 +3,9 @@
 All notable changes to Post Peek. Versions follow [semantic versioning](https://semver.org/),
 and each released version is a git tag and an upload to the Chrome Web Store and addons.mozilla.org.
 
-## [Unreleased]
+## [1.3.0] - 2026-10-04
+
+Bluesky support, and a privacy fix for images and video that affects every earlier version.
 
 ### Added
 
@@ -19,11 +21,12 @@ and each released version is a git tag and an upload to the Chrome Web Store and
   account, stay behind a click, as does all of a post labeled `!warn`, and avatars with
   those labels are left out.
 - New host permissions: `public.api.bsky.app`, `cdn.bsky.app`, `video.bsky.app`,
-  `video.cdn.bsky.app`. The extension no longer runs on `bsky.app` itself.
-
+  `video.cdn.bsky.app`. They fall under the access to all sites the extension already has,
+  so an update should not ask for anything new. If you limited the extension to specific
+  sites, allow these four as well, or Bluesky posts and their images will not load. The
+  extension no longer runs on `bsky.app` itself.
 - Bluesky link text that names one site while the link opens another is followed by the
   site it really opens.
-
 - Links to the addons.mozilla.org listing in README.md and `store/LISTING-FIREFOX.md`.
 - `homepage_url` in the manifest: the project page,
   [timvanbenschoten.com/code/post-peek](https://timvanbenschoten.com/code/post-peek), which
@@ -41,8 +44,21 @@ and each released version is a git tag and an upload to the Chrome Web Store and
   another site's query string is no longer dotted (it never opened in the popup).
 - PRIVACY.md, the README and the store listing now say what is true of video caching, GIFs
   loading when a post opens, and a site's ability to detect the extension through its dot
-  stylesheet. `store/LISTING.md` covers Bluesky and all seven host permissions.
-
+  stylesheet. `store/LISTING.md` covers Bluesky and all six host permissions.
+- The `video.twimg.com` host permission is gone. X video plays in the sandboxed frame,
+  which needs no permission, and X serves no image from that host.
+- The popup's host element is a plain `div` rather than a custom element. A page could
+  define the custom element's name and read the popup through it, closed shadow root or
+  not. The popup's styles now also hold against a page's own rules for divs.
+- The dot marker matches a link's host in any case, as the click handler always has.
+- The image proxy refuses anything over 20 MB, and a post quoted by a quoted Bluesky post
+  is withheld in the service worker under the same rules as the quote itself.
+- The release workflow pins `web-ext` to version 10 and no longer leaves its token in the
+  checkout.
+- The store screenshots show both networks: the links shot has a dotted X link and a dotted
+  Bluesky link, and a third screenshot, `store/screenshot-3.png`, shows a Bluesky post open
+  in the popup. `store/make-showcase.js` now gets its posts and images through the real
+  service worker code, so the screenshots show what the extension renders.
 - The addons.mozilla.org listing passed Mozilla's review and is public. README.md now points
   Firefox users straight to it instead of the release zip, and `store/LISTING-FIREFOX.md`
   records the approval.
@@ -73,8 +89,18 @@ and each released version is a git tag and an upload to the Chrome Web Store and
 - Esc closes the popup after a click on a video's controls. The click moved keyboard focus
   into the player's sandboxed frame, where the popup could not see the key; the popup now
   takes focus back as soon as a click puts it there.
+- The popup's footer left a dangling "·" after the date, with the counts on a line of their
+  own. Date and counts now share a line and wrap between items in a narrow popup, and the
+  "Open on" button no longer drops to a line of its own.
+- A quoted Bluesky post whose address cannot be read is left out, instead of becoming a box
+  that fails when clicked.
+- The service worker requests an X post only for an id that is a number.
+- A setting removed from storage no longer switches peeking off in open tabs.
 
 ### Known limitations
+
+- Firefox has no built-in HLS playback, so a Bluesky video there shows its thumbnail with a
+  link to watch it on Bluesky. X video plays in both browsers.
 
 - After you Tab into a video player's controls, Esc does not close the popup: the
   sandboxed frame keeps its key presses to itself. Tab back out first, or use the close
@@ -235,7 +261,9 @@ Repository and test changes only. The packaged extension - `manifest.json`, `src
   a release workflow that checks the tag against the manifest version and attaches the
   zip to a GitHub release, and Chrome Web Store listing copy, screenshots, and promo tiles.
 
-[Unreleased]: https://github.com/tsvb/post-peek/compare/v1.1.4...HEAD
+[Unreleased]: https://github.com/tsvb/post-peek/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/tsvb/post-peek/releases/tag/v1.3.0
+[1.2.0]: https://github.com/tsvb/post-peek/releases/tag/v1.2.0
 [1.1.4]: https://github.com/tsvb/post-peek/releases/tag/v1.1.4
 [1.1.3]: https://github.com/tsvb/post-peek/releases/tag/v1.1.3
 [1.1.2]: https://github.com/tsvb/post-peek/releases/tag/v1.1.2

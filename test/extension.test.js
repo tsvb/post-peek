@@ -111,7 +111,6 @@ test('manifest asks for only the declared permissions', () => {
   assert.deepStrictEqual(manifest.host_permissions.slice().sort(), [
     'https://cdn.syndication.twimg.com/*',
     'https://pbs.twimg.com/*',
-    'https://video.twimg.com/*',
     'https://public.api.bsky.app/*',
     'https://cdn.bsky.app/*',
     'https://video.bsky.app/*',
@@ -213,7 +212,7 @@ test('every host the click handler peeks is dotted, and no others', () => {
   // click handler peeks just the same.
   for (const host of dotted) {
     for (const scheme of ['http:', '']) {
-      assert.ok(contentCss.includes(`[href^="${scheme}//${host}/"]`), `no ${scheme}// dot for ${host}`);
+      assert.ok(contentCss.includes(`[href^="${scheme}//${host}/" i]`), `no ${scheme}// dot for ${host}`);
     }
   }
 });
@@ -279,7 +278,7 @@ test('parseLink reads Bluesky post links and rejects everything else', () => {
 
 test('Bluesky post links are dotted, and test.html has one', () => {
   assert.ok(contentCss.includes(
-    'a:is([href^="https://bsky.app/profile/"], [href^="http://bsky.app/profile/"])[href*="/post/"]::after',
+    'a:is([href^="https://bsky.app/profile/" i], [href^="http://bsky.app/profile/" i])[href*="/post/"]::after',
   ), 'content.css has no Bluesky dot rule matching BSKY_RE');
   assert.ok(read('test.html').includes('href="https://bsky.app/profile/bsky.app/post/3l6oveex3ii2l"'),
     'test.html has no peekable Bluesky link');
@@ -592,13 +591,33 @@ test('links allow any http(s) target but no other scheme', () => {
 
 // ---------------------------------------------------------------- service worker
 
-test('the proxy enforces the same media allowlist', () => {
+// The proxy only ever fetches images, and the manifest asks for exactly its
+// hosts plus the two that serve posts. video.twimg.com is in neither: the
+// player's frame loads X video with no help from the extension.
+test('the proxy enforces the same allowlist, less the video-only host', () => {
   const bg = evalExpr(
     backgroundJs,
     /const MEDIA_HOSTS = new Set\((\[[^\]]*\])\)/,
     'background MEDIA_HOSTS',
   );
-  assert.deepStrictEqual(bg.slice().sort(), MEDIA_HOSTS.slice().sort());
+  assert.deepStrictEqual(bg.slice().sort(), MEDIA_HOSTS.filter((h) => h !== 'video.twimg.com').sort());
+  const apis = ['cdn.syndication.twimg.com', 'public.api.bsky.app'];
+  assert.deepStrictEqual(
+    manifest.host_permissions.map((p) => new URL(p.replace('/*', '/')).hostname).sort(),
+    [...bg, ...apis].sort(),
+  );
+});
+
+// A custom element name would let the page define it and read the closed
+// shadow root through ElementInternals; a div then has to shrug off the
+// page's rules for divs.
+test('the popup host is a plain div the page cannot define or restyle', () => {
+  assert.ok(contentJs.includes("host = document.createElement('div');"));
+  assert.ok(!/createElement\('[a-z]+-[a-z-]+'\)/.test(contentJs), 'a custom element is created');
+  const css = read('src/popup-css.js');
+  assert.match(css, /:host \{\s*all: initial !important;/);
+  const colorSchemes = css.match(/^\s*color-scheme: [^;]*;/gm) || [];
+  assert.ok(colorSchemes.length >= 3 && colorSchemes.every((d) => d.includes('!important')), 'a :host declaration would lose to all: initial !important');
 });
 
 test('withheld Bluesky posts never reach the page', () => {
@@ -627,6 +646,14 @@ test('withheld Bluesky posts never reach the page', () => {
     assert.strictEqual(rec.$type, 'app.bsky.embed.record#viewNotFound');
     assert.ok(!('author' in rec), 'the withheld quote still carries its author');
   }
+
+  // The API also includes the post a quoted post quotes, one level down.
+  const shown = { $type: 'app.bsky.embed.record#viewRecord', uri: 'at://x/y/q', ...post() };
+  const nested = withholdQuote({
+    embed: { $type: 'app.bsky.embed.record#view', record: { ...shown, embeds: [{ $type: 'app.bsky.embed.record#view', record: { ...hidden } }] } },
+  });
+  assert.strictEqual(nested.embed.record.$type, 'app.bsky.embed.record#viewRecord');
+  assert.strictEqual(nested.embed.record.embeds[0].record.$type, 'app.bsky.embed.record#viewNotFound');
 });
 
 // The helpers above are only worth something if fetchBsky uses them, so this
@@ -677,6 +704,15 @@ test('cached posts are evicted when they expire', async () => {
   assert.strictEqual((backgroundJs.match(/cache\.set\(/g) || []).length, 1);
 });
 
+test('an X post id that is not a number is never requested', async () => {
+  let requests = 0;
+  const bg = loadBackground(async () => { requests++; return jsonResponse({}); });
+  for (const id of ['', 'abc', '20?x=1', 'bsky:did:plc:a/1', '1'.repeat(26)]) {
+    await assert.rejects(bg.fetchTweet(id), /POST_NOT_FOUND/);
+  }
+  assert.strictEqual(requests, 0);
+});
+
 test('the media proxy returns only images, from the allowlist, uncached', async () => {
   const image = (url, type = 'image/jpeg') => ({
     ok: true, status: 200, url, headers: { get: () => type }, arrayBuffer: async () => new Uint8Array([1, 2, 3]).buffer,
@@ -691,7 +727,11 @@ test('the media proxy returns only images, from the allowlist, uncached', async 
   const redirected = loadBackground(async () => image('https://evil.com/a.jpg'));
   await assert.rejects(redirected.fetchMedia('https://pbs.twimg.com/media/a.jpg'), /BAD_HOST/);
   const video = loadBackground(async (url) => image(url, 'video/mp4'));
-  await assert.rejects(video.fetchMedia('https://video.twimg.com/a.mp4'), /NOT_AN_IMAGE/);
+  await assert.rejects(video.fetchMedia('https://video.bsky.app/a.mp4'), /NOT_AN_IMAGE/);
+  // X video is loaded by the player's frame, never by the proxy.
+  await assert.rejects(bg.fetchMedia('https://video.twimg.com/a.mp4'), /BAD_HOST/);
+  const huge = loadBackground(async (url) => ({ ...image(url), headers: { get: (h) => (h === 'content-length' ? String(21 * 1024 * 1024) : 'image/jpeg') } }));
+  await assert.rejects(huge.fetchMedia('https://pbs.twimg.com/media/a.jpg'), /TOO_LARGE/);
 
   // video.cdn.bsky.app serves JPEG thumbnails as application/octet-stream, so
   // a mislabeled image is recognized by its first bytes, and only by those.

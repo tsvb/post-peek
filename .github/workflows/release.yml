@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-node@v5
         with:
@@ -50,7 +52,7 @@ jobs:
       - name: Lint the Firefox zip
         run: |
           unzip -q "dist/post-peek-${{ steps.manifest.outputs.version }}-firefox.zip" -d firefox-unpacked
-          npx --yes web-ext lint --source-dir=firefox-unpacked
+          npx --yes web-ext@10 lint --source-dir=firefox-unpacked
 
       - uses: actions/upload-artifact@v6
         with:

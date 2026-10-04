@@ -75,13 +75,13 @@ Stores the user's three preferences: whether peeking is enabled, whether openabl
 
 The dashboard has one box for every host permission and match pattern, so this covers all of them at once. Justifying only the syndication host leaves the broad content-script match unexplained, which is what an in-depth review asks about.
 
-cdn.syndication.twimg.com fetches the public content of the X post the user clicked - the same endpoint that powers X's embedded posts, requested with credentials omitted so no cookies reach X. public.api.bsky.app does the same for Bluesky posts - the unauthenticated API Bluesky's own embeds use. pbs.twimg.com and video.twimg.com (X) and cdn.bsky.app, video.bsky.app, and video.cdn.bsky.app (Bluesky) serve the post's avatar, photos, video thumbnail, and video. The extension's service worker fetches every image itself, with no cookies and no Referer, and displays it inline; a request made by the page instead would tell the media host which site the user is reading, so this requires host access. The content script runs on http and https pages because the extension must run on whatever page the user is reading to intercept clicks on post links and show the popup there. It does not scan the DOM: the dot marker is a static stylesheet matched on the link's href, and the click handler reads only the address of the link that was clicked. It does not read, store, or transmit page content, does not run in frames, and does not run on x.com, twitter.com, or bsky.app.
+cdn.syndication.twimg.com fetches the public content of the X post the user clicked - the same endpoint that powers X's embedded posts, requested with credentials omitted so no cookies reach X. public.api.bsky.app does the same for Bluesky posts - the unauthenticated API Bluesky's own embeds use. pbs.twimg.com (X) and cdn.bsky.app, video.bsky.app, and video.cdn.bsky.app (Bluesky) serve the post's avatar, photos, link-card images, and video thumbnails; a Bluesky video thumbnail is requested from video.bsky.app, which redirects to video.cdn.bsky.app. The extension's service worker fetches every image itself, with no cookies and no Referer, and displays it inline; a request made by the page instead would tell the media host which site the user is reading, so this requires host access. Video itself needs no host permission: it plays in a sandboxed frame, and X's video host, video.twimg.com, is no longer requested. The content script runs on http and https pages because the extension must run on whatever page the user is reading to intercept clicks on post links and show the popup there. It does not scan the DOM: the dot marker is a static stylesheet matched on the link's href, and the click handler reads only the address of the link that was clicked. It does not read, store, or transmit page content, does not run in frames, and does not run on x.com, twitter.com, or bsky.app.
 
 ### Are you using remote code?
 
 Select **No, I am not using remote code**. If the justification box is still required:
 
-All code ships in the extension package. Post content is fetched as data (JSON) and rendered with DOM APIs; no scripts are downloaded or executed.
+All code ships in the extension package. Post content is fetched as data (JSON) and rendered with DOM APIs; no scripts are downloaded or executed. Video plays in a sandboxed frame that contains markup only. A GIF's frame carries sandbox="allow-scripts" only because that is what lifts the sandbox's block on autoplay; the frame's document still has no script, and without allow-same-origin its origin stays opaque.
 
 ### Data usage
 
@@ -108,7 +108,10 @@ until they are done:
 ## Store assets
 
 - Icon: `icons/icon128.png`
-- Screenshots (1280x800): `store/screenshot-1.png`, `store/screenshot-2.png`
+- Screenshots (1280x800), in this order so they read as before and after: `store/screenshot-2.png`
+  (dotted links to an X post and a Bluesky post), `store/screenshot-1.png` (the X post open in the
+  popup), `store/screenshot-3.png` (the Bluesky post open in the popup). Regenerate all three with
+  `node store/make-showcase.js`.
 - Small promo tile (440x280): `store/promo-small-440x280.png`
 - Marquee promo tile (1400x560): `store/promo-marquee-1400x560.png`
 - Upload package: run `npm run build`, then upload `dist/post-peek-<version>.zip`

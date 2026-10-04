@@ -46,6 +46,7 @@ function remember(key, data) {
 }
 
 async function fetchTweet(id) {
+  if (!/^\d{1,25}$/.test(id)) throw new Error('POST_NOT_FOUND');
   const hit = cache.get(id);
   if (hit && Date.now() - hit.at < CACHE_TTL) return hit.data;
 
@@ -105,7 +106,7 @@ async function fetchBsky(actor, rkey) {
   const withheld = bskyWithheld(thread.post);
   if (withheld) throw new Error(withheld);
   const parent = thread.parent?.post;
-  const data = { post: withholdQuote(thread.post), parent: parent && !bskyWithheld(parent) ? parent : null };
+  const data = { post: withholdQuote(thread.post), parent: parent && !bskyWithheld(parent) ? withholdQuote(parent) : null };
   return remember(key, data);
 }
 
@@ -123,14 +124,20 @@ function bskyWithheld(post) {
 }
 
 // A withheld quoted post is swapped for the API's own "not found" view, so it
-// never reaches the page at all.
+// never reaches the page at all. That goes for a post quoted by the quoted
+// post too, which the API includes one level down.
 function withholdQuote(post) {
-  const e = post.embed;
-  const holder = e?.$type === 'app.bsky.embed.record#view' ? e
-    : e?.$type === 'app.bsky.embed.recordWithMedia#view' ? e.record : null;
-  if (holder?.record && bskyWithheld(holder.record)) {
-    holder.record = { $type: 'app.bsky.embed.record#viewNotFound', uri: holder.record.uri, notFound: true };
-  }
+  const withhold = (e) => {
+    const holder = e?.$type === 'app.bsky.embed.record#view' ? e
+      : e?.$type === 'app.bsky.embed.recordWithMedia#view' ? e.record : null;
+    if (!holder?.record) return;
+    if (bskyWithheld(holder.record)) {
+      holder.record = { $type: 'app.bsky.embed.record#viewNotFound', uri: holder.record.uri, notFound: true };
+    } else {
+      for (const inner of holder.record.embeds || []) withhold(inner);
+    }
+  };
+  withhold(post.embed);
   return post;
 }
 
@@ -147,12 +154,15 @@ function toBase64(buf) {
 // Every image in the popup (avatars, photos, card thumbnails, video posters) is
 // fetched here rather than by the page, so the request carries nothing about
 // the site being read: no cookies, no Referer, and no Origin naming it. Only
-// images, only from the media hosts declared in the manifest (before and after
-// any redirect), and never written to the browser's disk cache.
+// images, only from the image hosts declared in the manifest, and never written
+// to the browser's disk cache. A response that a redirect took off those hosts
+// is thrown away unread. video.twimg.com is not here: X serves no image from
+// it, and the player's frame loads video without the extension's permissions.
 const MEDIA_HOSTS = new Set([
-  'pbs.twimg.com', 'video.twimg.com',
+  'pbs.twimg.com',
   'cdn.bsky.app', 'video.bsky.app', 'video.cdn.bsky.app',
 ]);
+const MEDIA_MAX = 20 * 1024 * 1024;
 
 // The image type a file's first bytes say it is, or null. video.cdn.bsky.app
 // serves its JPEG thumbnails as application/octet-stream, so the header alone
@@ -174,7 +184,9 @@ async function fetchMedia(url) {
   if (!res.ok) throw new Error(`HTTP_${res.status}`);
   if (!MEDIA_HOSTS.has(new URL(res.url).hostname)) throw new Error('BAD_HOST');
   const declared = res.headers.get('content-type') || '';
+  if (Number(res.headers.get('content-length')) > MEDIA_MAX) throw new Error('TOO_LARGE');
   const buf = await res.arrayBuffer();
+  if (buf.byteLength > MEDIA_MAX) throw new Error('TOO_LARGE');
   const type = declared.startsWith('image/') ? declared : sniffImage(buf);
   if (!type) throw new Error('NOT_AN_IMAGE');
   return `data:${type};base64,${toBase64(buf)}`;

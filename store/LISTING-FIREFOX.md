@@ -84,7 +84,7 @@ https://github.com/tsvb/post-peek
 Post Peek is an independent project inspired by Litterbox, the Safari extension for iOS and macOS by Zhenyi Tan (And a Dinosaur). Litterbox is the original, it is free, and if you use Safari you should use it instead:
 https://andadinosaur.com/launch-litterbox
 
-The popup, the marker on links that can be opened, and the cookie-free fetching are all Litterbox's ideas. Post Peek is a separate Chrome and Firefox implementation of them, written from scratch. It is not affiliated with, endorsed by, or supported by Litterbox, And a Dinosaur, or X Corp.
+The popup, the marker on links that can be opened, and the cookie-free fetching are all Litterbox's ideas. Post Peek is a separate Chrome and Firefox implementation of them, written from scratch. It is not affiliated with, endorsed by, or supported by Litterbox, And a Dinosaur, X Corp., or Bluesky.
 
 ## Categories
 
@@ -114,24 +114,34 @@ fill in.
 
 ## Notes to reviewer
 
-Post Peek fetches the clicked post as JSON from cdn.syndication.twimg.com, the endpoint behind X's own embedded posts, or from public.api.bsky.app, the unauthenticated API behind Bluesky's, with credentials omitted and no Referer, and renders it with DOM APIs inside a closed shadow root. No remote code is loaded. pbs.twimg.com and video.twimg.com (X) and cdn.bsky.app, video.bsky.app, and video.cdn.bsky.app (Bluesky) serve the post's avatar, photos, video thumbnail, and video. The background script fetches every image itself and displays it inline, because a request made by the page would tell the media host which site the user is reading; that is why they are host permissions. Video plays in a sandboxed srcdoc frame that contains markup only, no script. The content script runs on http and https pages because it has to intercept clicks on post links wherever the user is reading; it does not scan the DOM (the dot marker is a static stylesheet matched on href) and reads only the address of the clicked link.
+Post Peek fetches the clicked post as JSON from cdn.syndication.twimg.com, the endpoint behind X's own embedded posts, or from public.api.bsky.app, the unauthenticated API behind Bluesky's, with credentials omitted and no Referer, and renders it with DOM APIs inside a closed shadow root. No remote code is loaded. pbs.twimg.com (X) and cdn.bsky.app, video.bsky.app, and video.cdn.bsky.app (Bluesky) serve the post's avatar, photos, link-card images, and video thumbnails (video.bsky.app redirects a thumbnail to video.cdn.bsky.app). The background script fetches every image itself and displays it inline, because a request made by the page would tell the media host which site the user is reading; that is why they are host permissions. Version 1.3.0 drops the video.twimg.com host permission, which video in a frame never needed. Video plays in a sandboxed srcdoc frame that contains markup only, no script. A GIF's frame carries sandbox="allow-scripts" only because that is what lifts the sandbox's block on autoplay; the frame's document still has no script, and without allow-same-origin its origin stays opaque. The content script runs on http and https pages because it has to intercept clicks on post links wherever the user is reading; it does not scan the DOM (the dot marker is a static stylesheet matched on href) and reads only the address of the clicked link.
 
 Build: `node scripts/build-zip.js` with Node 24, no dependencies. It zips `manifest.json`, `icons/`, `src/`, `options/` unchanged, except that for the Firefox zip `manifest.json` is rewritten by `scripts/firefox-manifest.js` (background service worker becomes a background script, plus the gecko block). Everything else in the zip is byte-identical to the repository at the tagged commit.
 
 Testing: serve the repository folder over HTTP (`python -m http.server 8000`) and open http://localhost:8000/test.html, which has post links for every accepted host and URL shape.
 
-## Version notes (first version)
+## Version notes
 
-First Firefox release. Same features as the Chrome extension.
+Paste into "Release notes" when uploading the version. For 1.3.0:
+
+Bluesky support: bsky.app post links are dotted and open in the popup, with text, images, link cards, quoted posts and reply context. Bluesky's moderation choices are honored, and labeled media stays behind a click. Bluesky video shows its thumbnail with a link to watch on Bluesky, because Firefox has no built-in HLS playback.
+
+Privacy fix: images and video no longer tell X or Bluesky which site you are reading. Images are now fetched by the extension itself, and video plays in a sandboxed frame, so no request carries the page's Origin or Referer. This affected X images and video in earlier versions.
+
+Permissions: four hosts were added for Bluesky (public.api.bsky.app, cdn.bsky.app, video.bsky.app and video.cdn.bsky.app), and video.twimg.com was dropped because it was never needed. If you limited the add-on to specific sites, allow the four new hosts as well.
+
+Also fixed: stray characters at the end of some X posts with emoji, HTML entities shown literally in X posts, Esc not closing the popup after a click on a video, and links staying intercepted in open tabs after the add-on was updated or removed.
 
 ## Assets
 
 - Icon: `icons/icon128.png` (AMO accepts 128x128 PNG and scales it)
 - Screenshots (1280x800), in this order so they read as before and after:
-  1. `store/screenshot-2.png`: A small blue dot marks every post link Post Peek can open,
-     so you know before you click.
-  2. `store/screenshot-1.png`: Click the link and the post opens in place: text, media,
+  1. `store/screenshot-2.png`: A small blue dot marks every X and Bluesky post link Post Peek
+     can open, so you know before you click.
+  2. `store/screenshot-1.png`: Click a link to an X post and it opens in place: text, media,
      date, and an Open on X button. Press Esc to close and keep reading.
+  3. `store/screenshot-3.png`: Bluesky posts open the same way, with an Open on Bluesky button.
+     No account needed on either site.
 
 ## Releasing updates
 

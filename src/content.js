@@ -62,7 +62,9 @@
       if (!host.isConnected) (document.body || document.documentElement).appendChild(host);
       return;
     }
-    host = document.createElement('post-peek-host');
+    // A plain div, not a custom element: a page can define any hyphenated name
+    // and reach a closed shadow root through its ElementInternals.
+    host = document.createElement('div');
     shadow = host.attachShadow({ mode: 'closed' });
     try {
       shadow.adoptedStyleSheets = [loadCss()];
@@ -160,9 +162,10 @@
     return `https://x.com/${t.user?.screen_name || 'i/web'}/status/${t.id_str}`;
   }
 
-  // Media may only come from the hosts the manifest declares and PRIVACY.md
-  // names, which is the same allowlist background.js applies to the proxy.
-  // Anything else fails closed rather than quietly contacting a third party.
+  // Media may only come from the hosts PRIVACY.md names. background.js applies
+  // the same allowlist to the image proxy, less video.twimg.com, which serves
+  // only the video the player's frame loads. Anything else fails closed rather
+  // than quietly contacting a third party.
   const MEDIA_HOSTS = new Set([
     'pbs.twimg.com', 'video.twimg.com',
     'cdn.bsky.app', 'video.bsky.app', 'video.cdn.bsky.app',
@@ -406,7 +409,7 @@
     const replies = fmtNum(t.conversation_count);
     if (replies != null) stats.append(el('span', { text: `${replies} replies` }));
     parts.push(el('div', { class: 'lb-foot' }, [
-      el('div', {}, [extLink(postUrl(t), fmtDate(t.created_at)), stats.childElementCount ? ' · ' : null, stats]),
+      el('div', { class: 'lb-meta' }, [extLink(postUrl(t), fmtDate(t.created_at)), stats]),
       extLink(postUrl(t), 'Open on X', { class: 'lb-open' }),
     ]));
     return parts;
@@ -561,8 +564,10 @@
       return el('div', { class: 'lb-quote lb-quote-gone', text: 'The quoted post is unavailable.' });
     }
     if (rec.value?.$type !== 'app.bsky.feed.post') return null; // a feed, list or starter pack
+    const ref = bskyRef(rec.uri);
+    if (!ref) return null;
     const p = { ...rec, record: rec.value };
-    return quoteBox([bskyHead(p, true), ...bskyBody(p, rec.embeds?.[0], true)], bskyRef(rec.uri));
+    return quoteBox([bskyHead(p, true), ...bskyBody(p, rec.embeds?.[0], true)], ref);
   }
 
   function renderBsky({ post: p, parent }) {
@@ -582,7 +587,7 @@
       if (n != null) stats.append(el('span', { text: `${fmtNum(n)} ${label}` }));
     }
     parts.push(el('div', { class: 'lb-foot' }, [
-      el('div', {}, [extLink(bskyUrl(p), fmtDate(r.createdAt)), stats.childElementCount ? ' · ' : null, stats]),
+      el('div', { class: 'lb-meta' }, [extLink(bskyUrl(p), fmtDate(r.createdAt)), stats]),
       extLink(bskyUrl(p), 'Open on Bluesky', { class: 'lb-open' }),
     ]));
     return parts;
@@ -695,7 +700,7 @@
     chrome.storage.local.get(settings, (s) => { Object.assign(settings, s); applySettings(); });
     chrome.storage.onChanged.addListener((changes, area) => {
       if (area !== 'local') return;
-      for (const [k, v] of Object.entries(changes)) if (k in settings) settings[k] = v.newValue;
+      for (const [k, v] of Object.entries(changes)) if (k in settings && v.newValue !== undefined) settings[k] = v.newValue;
       applySettings();
     });
   } catch { /* storage unavailable */ }

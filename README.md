@@ -30,7 +30,7 @@
 
 <table>
   <tr>
-    <td width="50%"><img src="media/shot-links.png" alt="An article with two post links (to x.com in this example), each followed by a small blue dot."></td>
+    <td width="50%"><img src="media/shot-links.png" alt="An article with two post links, one to x.com and one to bsky.app, each followed by a small blue dot."></td>
     <td width="50%"><img src="media/shot-popup.png" alt="The same article with the post open in a popup over the page, showing text, a photo, the date, and a button to open it on its own site (X in this example)."></td>
   </tr>
   <tr>
@@ -58,6 +58,8 @@ Post Peek is not affiliated with X Corp. or with Bluesky.
   moderators have hidden, and keeps media labeled as adult or graphic behind a click.
 - Never scans the page or touches its links. The dot is pure CSS; only the clicked link is inspected.
 - Little for websites to probe: no web-accessible resources, no response to clicks a page fakes, and with dots turned off nothing is written to the page. (The dot stylesheet is always present, so a site that goes looking can still tell the extension is installed.)
+- Bluesky video needs HLS playback, which Firefox does not have built in, so there a Bluesky video
+  shows its thumbnail with a link to watch it on Bluesky.
 - Settings stay on your device (local extension storage, never synced).
 - No data collection. See [PRIVACY.md](PRIVACY.md).
 
@@ -160,7 +162,7 @@ the one post and leave."
 
 Post Peek is a separate Chrome and Firefox implementation of that idea, written from scratch. Litterbox
 is closed source, so no Litterbox code or artwork is used here. Post Peek is not
-affiliated with, endorsed by, or supported by Zhenyi Tan, And a Dinosaur, or X Corp, so
+affiliated with, endorsed by, or supported by Zhenyi Tan, And a Dinosaur, X Corp. or Bluesky, so
 anything wrong with this extension is not theirs to answer for - report it on
 [this repository's issues](https://github.com/tsvb/post-peek/issues).
 
