@@ -1,22 +1,25 @@
 # Post Peek
 
-Read one X post and leave. A Chrome (Manifest V3) extension that opens x.com and
-twitter.com post links in a popup instead of sending you to the full site.
+Read one post and leave. A Chrome (Manifest V3) extension that opens x.com,
+twitter.com and bsky.app post links in a popup instead of sending you to the full site.
 
 Post Peek is an independent, open-source project inspired by the Safari extension
 [Litterbox - Post Peeker](https://apps.apple.com/us/app/litterbox-post-peeker/id6805719216)
-by And a Dinosaur. It is not affiliated with that project or with X Corp.
+by And a Dinosaur. It is not affiliated with that project, with X Corp., or with Bluesky.
 
 ## Features
 
 - Opens post links in a popup so you can read the one post and close it.
 - Marks openable links with a small blue dot.
 - Renders text, photos, video, link cards, quoted posts, and reply context.
-- Uses the same syndication API that powers X's embed widgets.
-- Never sends cookies or a Referer to X: posts and media are fetched anonymously, so X
-  cannot tie a peek to your account or learn which site you were reading. No account needed.
+- Uses the same syndication API that powers X's embed widgets, and Bluesky's public API.
+- Never sends cookies, a Referer, or an Origin naming the page to X or Bluesky: posts and images are
+  fetched by the extension itself and video plays in a sandboxed frame, so neither site can tie a peek
+  to your account or learn which site you were reading. No account needed.
+- Respects Bluesky authors who hide their posts from logged-out viewers and posts Bluesky's
+  moderators have hidden, and keeps media labeled as adult or graphic behind a click.
 - Never scans the page or touches its links. The dot is pure CSS; only the clicked link is inspected.
-- Nothing for websites to probe: no web-accessible resources, and with dots turned off nothing whatsoever is written to the page.
+- Little for websites to probe: no web-accessible resources, no response to clicks a page fakes, and with dots turned off nothing is written to the page. (The dot stylesheet is always present, so a site that goes looking can still tell the extension is installed.)
 - Settings stay on your device (`chrome.storage.local`, never synced).
 - No data collection. See [PRIVACY.md](PRIVACY.md).
 
@@ -59,8 +62,8 @@ zip to the Chrome Web Store.
 ## Layout
 
 - `manifest.json` - MV3 manifest.
-- `src/background.js` - service worker; fetches posts from `cdn.syndication.twimg.com` and proxies images when a page's CSP blocks `twimg.com`.
-- `src/content.js` - intercepts clicks on post links and renders the popup inside a closed Shadow DOM.
+- `src/background.js` - service worker; fetches posts from `cdn.syndication.twimg.com` and `public.api.bsky.app`, and fetches every image the popup shows, so no image request comes from the page.
+- `src/content.js` - intercepts clicks on post links and renders the popup inside a closed Shadow DOM, with video in a sandboxed frame.
 - `src/content.css` - dot marker, matched purely on the link's `href`.
 - `src/popup-css.js` - popup stylesheet embedded as a string (so nothing is web-accessible).
 - `options/` - settings page (also the toolbar popup).

@@ -3,6 +3,77 @@
 All notable changes to Post Peek. Versions follow [semantic versioning](https://semver.org/),
 and each released version is a git tag and a Chrome Web Store upload.
 
+## [Unreleased]
+
+### Added
+
+- Bluesky support: `bsky.app/profile/<handle or DID>/post/<id>` links are dotted and open
+  in the popup, with text and links, images, video, link cards, quoted posts and reply
+  context. Posts come from Bluesky's public API (`public.api.bsky.app`), fetched like X
+  posts: no cookies, no Referer.
+- Bluesky moderation is honored as bsky.app does for logged-out viewers. Posts are not
+  shown if their authors asked to be hidden from logged-out viewers, or if Bluesky's
+  moderators hid them (`!hide` on the post or the account). That covers reply context and
+  quoted posts too, withheld in the service worker before they reach the page. Media and
+  link cards labeled porn, sexual, nudity, graphic-media or gore, on the post or the
+  account, stay behind a click, as does all of a post labeled `!warn`, and avatars with
+  those labels are left out.
+- New host permissions: `public.api.bsky.app`, `cdn.bsky.app`, `video.bsky.app`,
+  `video.cdn.bsky.app`. The extension no longer runs on `bsky.app` itself.
+
+- Bluesky link text that names one site while the link opens another is followed by the
+  site it really opens.
+
+### Changed
+
+- Every image (avatars, photos, card thumbnails, video posters) is now fetched by the
+  service worker instead of by the page. The media proxy also checks the host after
+  redirects, returns only images, and keeps them out of the browser's disk cache.
+- Bluesky GIFs loop on their own, as X GIFs already did, instead of waiting for play.
+- Media behind a "Show" button is not requested until the button is pressed.
+- The dot marker matches hosts only at the start of a link's address, so a post URL inside
+  another site's query string is no longer dotted (it never opened in the popup).
+- PRIVACY.md, the README and the store listing now say what is true of video caching, GIFs
+  loading when a post opens, and a site's ability to detect the extension through its dot
+  stylesheet. `store/LISTING.md` covers Bluesky and all seven host permissions.
+
+### Fixed
+
+- Images and video told X and Bluesky which site you were reading, through the `Origin`
+  header that `crossorigin="anonymous"` adds to each request. This affected every X image
+  and video since 1.0. Images now come through the service worker, and video plays in a
+  sandboxed frame whose requests carry `Origin: null`.
+- Playing a video also sent the page you were reading in the `Referer` header. `<video>`
+  honors `referrerpolicy` only for its poster, not for the stream. The player's frame has
+  a no-referrer policy, so playlists and segments carry no Referer. This affected X video
+  in every earlier version.
+- A page could dispatch a click on a post link itself, which revealed the extension even
+  with dots off and made it fetch a post of the page's choosing. Only real clicks count now.
+- After the extension was disabled, removed or updated, open tabs kept intercepting post
+  links and showed "Post Peek was updated". The leftover script now steps aside and links
+  open normally.
+- On a page that replaced its `<body>`, clicks on post links were swallowed and no popup
+  appeared.
+- X post text showed `&amp;`, `&lt;` and `&gt;` literally.
+- Expired posts stayed in the service worker's memory until the same post was requested
+  again. They are now dropped after five minutes.
+
+### Known limitations
+
+- While keyboard focus is inside a video player, Esc does not close the popup: the
+  sandboxed frame keeps its key presses to itself. Click outside the video first, or use
+  the close button.
+- A video the page's Content Security Policy blocks shows an empty player rather than a
+  "could not be loaded" message, because the frame cannot report the failure.
+
+### Repository
+
+- `.gitattributes` keeps line endings as LF, and the tests normalize them, so a checkout
+  made with `core.autocrlf=true` passes.
+- Tests now run the real service worker functions against a stubbed `fetch` (withholding,
+  cache eviction, the media proxy), exercise the click handler, and pin down that no image
+  or video is ever loaded from the page directly.
+
 ## [1.1.4] - 2026-09-06
 
 Repository and test changes only. The packaged extension - `manifest.json`, `src/`,

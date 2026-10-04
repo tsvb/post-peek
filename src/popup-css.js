@@ -80,7 +80,7 @@ var POST_PEEK_CSS = `
 .lb-name a:hover { text-decoration: underline; }
 .lb-badge { width: 16px; height: 16px; fill: var(--lb-accent); flex: 0 0 auto; }
 .lb-handle { color: var(--lb-muted); font-size: 14px; }
-.lb-x {
+.lb-logo {
   width: 22px; height: 22px; fill: var(--lb-fg); opacity: .85; flex: 0 0 auto;
 }
 .lb-close {
@@ -101,6 +101,7 @@ var POST_PEEK_CSS = `
 }
 .lb-text a { color: var(--lb-accent); text-decoration: none; }
 .lb-text a:hover { text-decoration: underline; }
+.lb-goes { color: var(--lb-muted); font-size: 14px; }
 
 .lb-media {
   margin-top: 12px; border-radius: 12px; overflow: hidden;
@@ -112,11 +113,17 @@ var POST_PEEK_CSS = `
 .lb-media.n3 { grid-template-columns: 1fr 1fr; }
 .lb-media.n3 > :first-child { grid-row: span 2; }
 .lb-media.n4 { grid-template-columns: 1fr 1fr; }
-.lb-media img, .lb-media video {
+.lb-media img {
   display: block; width: 100%; height: 100%; object-fit: cover;
   max-height: 70vh; background: #000;
 }
-.lb-media.n1 img, .lb-media.n1 video { object-fit: contain; height: auto; }
+.lb-media.n1 img { object-fit: contain; height: auto; }
+/* Video player frame; content.js sets the real aspect ratio when it is known. */
+.lb-player {
+  display: block; margin: 0 auto; border: 0; background: #000;
+  aspect-ratio: var(--lb-ratio, 16 / 9);
+  width: min(100%, calc(70vh * var(--lb-ratio, 16 / 9)));
+}
 .lb-media a { display: block; }
 .lb-media-fail {
   color: #fff; padding: 24px; text-align: center; font-size: 14px;
@@ -134,6 +141,16 @@ var POST_PEEK_CSS = `
 .lb-quote .lb-who { flex-direction: row; gap: 4px; align-items: baseline; }
 .lb-quote .lb-text { font-size: 15px; margin-top: 6px; }
 .lb-quote .lb-media { margin-top: 8px; }
+.lb-quote-gone { cursor: default; color: var(--lb-muted); font-size: 14px; }
+.lb-quote-gone:hover { filter: none; }
+
+.lb-reveal {
+  margin-top: 12px; width: 100%; padding: 28px 12px;
+  border: 1px solid var(--lb-border); border-radius: 12px;
+  background: var(--lb-quote-bg); color: var(--lb-muted);
+  font: inherit; font-size: 14px; cursor: pointer;
+}
+.lb-reveal:hover { color: var(--lb-fg); }
 
 .lb-card-link {
   margin-top: 12px; display: block; border: 1px solid var(--lb-border);

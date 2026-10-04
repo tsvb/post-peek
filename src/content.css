@@ -1,27 +1,46 @@
-/* Post Peek: dot marker on openable x.com / twitter.com post links.
+/* Post Peek: dot marker on openable x.com / twitter.com and bsky.app post links.
    Delivered via manifest "css" so it is not subject to the host page's CSP.
 
    Links are matched purely by their href attribute. The extension never adds
    attributes to the page's links, so page scripts cannot use them to detect
    the extension, and no MutationObserver has to walk the DOM.
 
-   The host list mirrors POST_RE in content.js exactly, so every link the
-   click handler will peek is dotted, and nothing else is.
+   The X host list mirrors POST_RE in content.js exactly, and the Bluesky
+   rule mirrors BSKY_RE, so every link the click handler will peek is dotted,
+   and nothing else is. Hosts are matched at the start of the href (https,
+   http or scheme-relative), so a post address buried in another site's query
+   string gets no dot.
 
    Dots are opt-in at the stylesheet level: they appear only once content.js
    has read the setting and marked <html data-postpeek-dots>. That way a user
    who has turned dots off never sees them flash before the setting loads, and
    nothing at all is written to the page. When dots are on, the attribute adds
-   no information a page could not already get from the dot's computed style. */
+   no information a page could not already get from the dot's computed style.
+   This stylesheet is injected either way, so a page that sets the attribute
+   itself can still see the rule take effect. */
 html[data-postpeek-dots]
   a:is(
-    [href*="//x.com/"], [href*="//www.x.com/"], [href*="//mobile.x.com/"], [href*="//m.x.com/"],
-    [href*="//twitter.com/"], [href*="//www.twitter.com/"], [href*="//mobile.twitter.com/"], [href*="//m.twitter.com/"],
-    [href*="//fxtwitter.com/"], [href*="//www.fxtwitter.com/"], [href*="//mobile.fxtwitter.com/"], [href*="//m.fxtwitter.com/"],
-    [href*="//vxtwitter.com/"], [href*="//www.vxtwitter.com/"], [href*="//mobile.vxtwitter.com/"], [href*="//m.vxtwitter.com/"],
-    [href*="//fixupx.com/"], [href*="//www.fixupx.com/"], [href*="//mobile.fixupx.com/"], [href*="//m.fixupx.com/"],
-    [href*="//fixvx.com/"], [href*="//www.fixvx.com/"], [href*="//mobile.fixvx.com/"], [href*="//m.fixvx.com/"]
-  ):is([href*="/status/"], [href*="/statuses/"])::after {
+    [href^="https://x.com/"], [href^="https://www.x.com/"], [href^="https://mobile.x.com/"], [href^="https://m.x.com/"],
+    [href^="https://twitter.com/"], [href^="https://www.twitter.com/"], [href^="https://mobile.twitter.com/"], [href^="https://m.twitter.com/"],
+    [href^="https://fxtwitter.com/"], [href^="https://www.fxtwitter.com/"], [href^="https://mobile.fxtwitter.com/"], [href^="https://m.fxtwitter.com/"],
+    [href^="https://vxtwitter.com/"], [href^="https://www.vxtwitter.com/"], [href^="https://mobile.vxtwitter.com/"], [href^="https://m.vxtwitter.com/"],
+    [href^="https://fixupx.com/"], [href^="https://www.fixupx.com/"], [href^="https://mobile.fixupx.com/"], [href^="https://m.fixupx.com/"],
+    [href^="https://fixvx.com/"], [href^="https://www.fixvx.com/"], [href^="https://mobile.fixvx.com/"], [href^="https://m.fixvx.com/"],
+    [href^="http://x.com/"], [href^="http://www.x.com/"], [href^="http://mobile.x.com/"], [href^="http://m.x.com/"],
+    [href^="http://twitter.com/"], [href^="http://www.twitter.com/"], [href^="http://mobile.twitter.com/"], [href^="http://m.twitter.com/"],
+    [href^="http://fxtwitter.com/"], [href^="http://www.fxtwitter.com/"], [href^="http://mobile.fxtwitter.com/"], [href^="http://m.fxtwitter.com/"],
+    [href^="http://vxtwitter.com/"], [href^="http://www.vxtwitter.com/"], [href^="http://mobile.vxtwitter.com/"], [href^="http://m.vxtwitter.com/"],
+    [href^="http://fixupx.com/"], [href^="http://www.fixupx.com/"], [href^="http://mobile.fixupx.com/"], [href^="http://m.fixupx.com/"],
+    [href^="http://fixvx.com/"], [href^="http://www.fixvx.com/"], [href^="http://mobile.fixvx.com/"], [href^="http://m.fixvx.com/"],
+    [href^="//x.com/"], [href^="//www.x.com/"], [href^="//mobile.x.com/"], [href^="//m.x.com/"],
+    [href^="//twitter.com/"], [href^="//www.twitter.com/"], [href^="//mobile.twitter.com/"], [href^="//m.twitter.com/"],
+    [href^="//fxtwitter.com/"], [href^="//www.fxtwitter.com/"], [href^="//mobile.fxtwitter.com/"], [href^="//m.fxtwitter.com/"],
+    [href^="//vxtwitter.com/"], [href^="//www.vxtwitter.com/"], [href^="//mobile.vxtwitter.com/"], [href^="//m.vxtwitter.com/"],
+    [href^="//fixupx.com/"], [href^="//www.fixupx.com/"], [href^="//mobile.fixupx.com/"], [href^="//m.fixupx.com/"],
+    [href^="//fixvx.com/"], [href^="//www.fixvx.com/"], [href^="//mobile.fixvx.com/"], [href^="//m.fixvx.com/"]
+  ):is([href*="/status/"], [href*="/statuses/"])::after,
+html[data-postpeek-dots]
+  a:is([href^="https://bsky.app/profile/"], [href^="http://bsky.app/profile/"])[href*="/post/"]::after {
   content: "";
   display: inline-block;
   width: 6px;

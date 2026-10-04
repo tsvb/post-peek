@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Post Peek",
   "version": "1.1.4",
-  "description": "Read one X post and leave. Opens x.com and twitter.com post links in a popup, not the full site. No account, no cookies sent to X.",
+  "description": "Read one post and leave. Opens X and Bluesky post links in a popup, not the full site. No account, no cookies sent to either.",
   "icons": {
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",
@@ -13,7 +13,11 @@
   "host_permissions": [
     "https://cdn.syndication.twimg.com/*",
     "https://pbs.twimg.com/*",
-    "https://video.twimg.com/*"
+    "https://video.twimg.com/*",
+    "https://public.api.bsky.app/*",
+    "https://cdn.bsky.app/*",
+    "https://video.bsky.app/*",
+    "https://video.cdn.bsky.app/*"
   ],
   "background": {
     "service_worker": "src/background.js"
@@ -25,7 +29,8 @@
         "https://x.com/*",
         "https://*.x.com/*",
         "https://twitter.com/*",
-        "https://*.twitter.com/*"
+        "https://*.twitter.com/*",
+        "https://bsky.app/*"
       ],
       "js": ["src/popup-css.js", "src/content.js"],
       "css": ["src/content.css"],

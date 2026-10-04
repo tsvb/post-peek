@@ -63,6 +63,25 @@
     <li><a href="https://x.com/jack/status/20"><b>markup</b> inside the link</a></li>
   </ul>
 
+  <h2>Should show a dot and peek: Bluesky</h2>
+  <p class="note">
+    The dot rule for these mirrors <code>BSKY_RE</code> in <code>src/content.js</code>.
+    Bluesky video is HLS only, so where the browser cannot play HLS natively the
+    video post shows its thumbnail and a "Watch on Bluesky" link instead.
+  </p>
+  <ul class="wide">
+    <li><a href="https://bsky.app/profile/bsky.app/post/3l6oveex3ii2l">text post</a></li>
+    <li><a href="https://bsky.app/profile/bsky.app/post/3mtcnex43tk24">links in the text (UTF-8 facets)</a></li>
+    <li><a href="https://bsky.app/profile/bsky.app/post/3mv3shqdfuc2e">images</a></li>
+    <li><a href="https://bsky.app/profile/bsky.app/post/3movpwtbjgs2d">link card</a></li>
+    <li><a href="https://bsky.app/profile/bsky.app/post/3mw2cdr44fc2a">quote post</a></li>
+    <li><a href="https://bsky.app/profile/bsky.app/post/3mwolmfws5k2r">quoting a starter pack (not a post)</a></li>
+    <li><a href="https://bsky.app/profile/bsky.app/post/3mv6jm4auic2g">reply</a></li>
+    <li><a href="https://bsky.app/profile/did:plc:xb2urvqt5f4zzccjs46hysbf/post/3muplmkx56s2k">video, DID form</a></li>
+    <li><a href="https://bsky.app/profile/did%3Aplc%3Az72i7hdynmk6r22z27h6tvur/post/3l6oveex3ii2l">percent-encoded DID</a></li>
+    <li><a href="https://bsky.app/profile/bsky.app/post/3l6oveex3ii2x">deleted or missing post (error state)</a></li>
+  </ul>
+
   <h2>Should NOT get a dot, and should navigate normally</h2>
   <ul class="wide">
     <li><a href="https://x.com/jack">profile link</a></li>
@@ -72,6 +91,10 @@
     <li><a href="https://notx.com/jack/status/20">notx.com (host must match exactly)</a></li>
     <li><a href="https://x.com.evil.com/jack/status/20">x.com.evil.com (suffix trick)</a></li>
     <li><a href="https://evil.com/?u=https://x.com/jack/status/20">x.com post URL in a query string</a></li>
+    <li><a href="https://bsky.app/profile/bsky.app">Bluesky profile</a></li>
+    <li><a href="https://bsky.app/profile/bsky.app/feed/whats-hot">Bluesky feed</a></li>
+    <li><a href="https://bsky.app.evil.com/profile/bsky.app/post/3l6oveex3ii2l">bsky.app.evil.com (suffix trick)</a></li>
+    <li><a href="https://evil.com/?u=https://bsky.app/profile/bsky.app/post/3l6oveex3ii2l">bsky.app post URL in a query string</a></li>
   </ul>
 
   <h2>Known cosmetic mismatch: dotted, but will not peek</h2>

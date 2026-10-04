@@ -1,8 +1,9 @@
 // Post Peek
 // Service worker: fetches posts from X's syndication API (the same backend that
-// powers X's embed widgets). All requests are made with credentials omitted and
-// no Referer, so no cookies are ever sent to X and X never learns which page
-// you were reading. Fetched posts are held only in memory for a few minutes.
+// powers X's embed widgets) and from Bluesky's public AppView. All requests are
+// made with credentials omitted and no Referer, so no cookies are ever sent to
+// either site and neither learns which page you were reading. Fetched posts
+// are held only in memory, for at most five minutes.
 
 const SYNDICATION = 'https://cdn.syndication.twimg.com/tweet-result';
 
@@ -34,6 +35,16 @@ const FEATURES = [
 const cache = new Map();
 const CACHE_TTL = 5 * 60 * 1000;
 
+// Keeps a fetched post for CACHE_TTL and no longer: the entry is dropped when
+// its time is up, not just ignored, unless the worker was shut down first
+// (which empties the cache anyway).
+function remember(key, data) {
+  const entry = { at: Date.now(), data };
+  cache.set(key, entry);
+  setTimeout(() => { if (cache.get(key) === entry) cache.delete(key); }, CACHE_TTL);
+  return data;
+}
+
 async function fetchTweet(id) {
   const hit = cache.get(id);
   if (hit && Date.now() - hit.at < CACHE_TTL) return hit.data;
@@ -60,8 +71,67 @@ async function fetchTweet(id) {
   if (!data || data.__typename === 'TweetTombstone') {
     throw new Error('POST_UNAVAILABLE');
   }
-  cache.set(id, { at: Date.now(), data });
-  return data;
+  return remember(id, data);
+}
+
+const BSKY_THREAD = 'https://public.api.bsky.app/xrpc/app.bsky.feed.getPostThread';
+const BSKY_ACTOR_RE = /^(?:did:[a-z]+:[A-Za-z0-9._:%-]+|[A-Za-z0-9.-]+)$/;
+const BSKY_RKEY_RE = /^[A-Za-z0-9._~:-]{1,512}$/;
+
+// Returns { post, parent }: the post and, for a reply, the post it replies to.
+async function fetchBsky(actor, rkey) {
+  if (!BSKY_ACTOR_RE.test(actor) || !BSKY_RKEY_RE.test(rkey)) throw new Error('POST_NOT_FOUND');
+  const key = `bsky:${actor}/${rkey}`;
+  const hit = cache.get(key);
+  if (hit && Date.now() - hit.at < CACHE_TTL) return hit.data;
+
+  const url = new URL(BSKY_THREAD);
+  url.searchParams.set('uri', `at://${actor}/app.bsky.feed.post/${rkey}`);
+  url.searchParams.set('depth', '0');
+  url.searchParams.set('parentHeight', '1');
+
+  const res = await fetch(url.href, {
+    credentials: 'omit',
+    referrerPolicy: 'no-referrer',
+    cache: 'no-store',
+    headers: { Accept: 'application/json' },
+  });
+  const body = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(body?.error === 'NotFound' ? 'POST_NOT_FOUND' : `HTTP_${res.status}`);
+
+  const thread = body?.thread;
+  if (thread?.$type === 'app.bsky.feed.defs#notFoundPost') throw new Error('POST_NOT_FOUND');
+  if (!thread?.post) throw new Error('POST_UNAVAILABLE'); // blocked, or an unknown shape
+  const withheld = bskyWithheld(thread.post);
+  if (withheld) throw new Error(withheld);
+  const parent = thread.parent?.post;
+  const data = { post: withholdQuote(thread.post), parent: parent && !bskyWithheld(parent) ? parent : null };
+  return remember(key, data);
+}
+
+// Why a Bluesky post (or quoted post) must not be shown, or null. bsky.app
+// shows neither kind to logged-out viewers: an author's request to be hidden
+// from them, and a "!hide" label from Bluesky's moderators on the post or the
+// account (an account label has the DID itself as its subject).
+function bskyWithheld(post) {
+  const author = post?.author || {};
+  const labels = author.labels || [];
+  if (labels.some((l) => l.val === '!no-unauthenticated')) return 'LOGGED_IN_ONLY';
+  if ((post?.labels || []).some((l) => l.val === '!hide')) return 'HIDDEN_BY_BLUESKY';
+  if (labels.some((l) => l.val === '!hide' && l.uri === author.did)) return 'HIDDEN_BY_BLUESKY';
+  return null;
+}
+
+// A withheld quoted post is swapped for the API's own "not found" view, so it
+// never reaches the page at all.
+function withholdQuote(post) {
+  const e = post.embed;
+  const holder = e?.$type === 'app.bsky.embed.record#view' ? e
+    : e?.$type === 'app.bsky.embed.recordWithMedia#view' ? e.record : null;
+  if (holder?.record && bskyWithheld(holder.record)) {
+    holder.record = { $type: 'app.bsky.embed.record#viewNotFound', uri: holder.record.uri, notFound: true };
+  }
+  return post;
 }
 
 function toBase64(buf) {
@@ -74,17 +144,24 @@ function toBase64(buf) {
   return btoa(bin);
 }
 
-// Used as a fallback when the host page's Content-Security-Policy blocks
-// loading images from twimg.com directly. Only the media hosts declared in the
-// manifest are allowed.
-const MEDIA_HOSTS = new Set(['pbs.twimg.com', 'video.twimg.com']);
+// Every image in the popup (avatars, photos, card thumbnails, video posters) is
+// fetched here rather than by the page, so the request carries nothing about
+// the site being read: no cookies, no Referer, and no Origin naming it. Only
+// images, only from the media hosts declared in the manifest (before and after
+// any redirect), and never written to the browser's disk cache.
+const MEDIA_HOSTS = new Set([
+  'pbs.twimg.com', 'video.twimg.com',
+  'cdn.bsky.app', 'video.bsky.app', 'video.cdn.bsky.app',
+]);
 
 async function fetchMedia(url) {
   const u = new URL(url);
   if (u.protocol !== 'https:' || !MEDIA_HOSTS.has(u.hostname)) throw new Error('BAD_HOST');
-  const res = await fetch(u.href, { credentials: 'omit', referrerPolicy: 'no-referrer' });
+  const res = await fetch(u.href, { credentials: 'omit', referrerPolicy: 'no-referrer', cache: 'no-store' });
   if (!res.ok) throw new Error(`HTTP_${res.status}`);
-  const type = res.headers.get('content-type') || 'application/octet-stream';
+  if (!MEDIA_HOSTS.has(new URL(res.url).hostname)) throw new Error('BAD_HOST');
+  const type = res.headers.get('content-type') || '';
+  if (!type.startsWith('image/')) throw new Error('NOT_AN_IMAGE');
   const buf = await res.arrayBuffer();
   return `data:${type};base64,${toBase64(buf)}`;
 }
@@ -94,6 +171,8 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     try {
       if (msg?.type === 'fetchTweet') {
         sendResponse({ ok: true, data: await fetchTweet(String(msg.id)) });
+      } else if (msg?.type === 'fetchBsky') {
+        sendResponse({ ok: true, data: await fetchBsky(String(msg.actor), String(msg.rkey)) });
       } else if (msg?.type === 'fetchMedia') {
         sendResponse({ ok: true, data: await fetchMedia(String(msg.url)) });
       } else {
