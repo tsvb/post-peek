@@ -149,3 +149,8 @@ https://addons.mozilla.org/firefox/addon/post-peek/
 
 Submitted 13 September 2026 as 1.2.0 (add-on ID `post-peek@timvbs.com`, support email
 postpeek@timvbs.com). Approved by Mozilla; confirmed public on 16 September 2026.
+
+Later versions:
+
+- 1.3.0 (Bluesky support): submitted and approved on 4 October 2026.
+- 1.4.0 (a switch for each site): submitted and approved on 4 October 2026.
